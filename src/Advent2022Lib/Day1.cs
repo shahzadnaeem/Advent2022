@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Advent2022;
 
 public class Day1
@@ -29,39 +31,35 @@ public class Day1
         return new Model(Day1Data.INPUT);
     }
 
-    public (long, long) GetMaxCalories(long[] counts, long lessThan = long.MaxValue)
+    public List<(long, long)> CaloriesByElf(Model model)
     {
-        long max = 0;
-        long elf = 1;
-        long maxElf = elf;
-        long currSum = 0;
+        var result = new List<(long, long)>();
 
-        foreach (var count in counts)
+        long elfNum = 1;
+        long currTotal = 0;
+
+        foreach (var value in model.Rows)
         {
-            if (count != 0)
+            if (value == 0)
             {
-                currSum += count;
+                result.Add((currTotal, elfNum));
+                elfNum++;
+                currTotal = 0;
             }
             else
             {
-                if (currSum > max && currSum < lessThan)
-                {
-                    max = currSum;
-                    maxElf = elf;
-                }
-                elf++;
-                currSum = 0;
+                currTotal += value;
             }
         }
 
-        // Final check
-        if (currSum > max && currSum < lessThan)
+        if (currTotal != 0)
         {
-            max = currSum;
-            maxElf = elf;
+            result.Add((currTotal, elfNum++));
         }
 
-        return (max, maxElf);
+        result = result.OrderByDescending(entry => entry.Item1).ToList();
+
+        return result;
     }
 
     public (long, long) Answer()
@@ -72,23 +70,12 @@ public class Day1
         Console.WriteLine($"#ROWS = {model.Rows.Length}");
 
         // Part 1
-        var result1 = GetMaxCalories(model.Rows);
+        var result1 = CaloriesByElf(model).Take(1).Single();
 
         Console.WriteLine($"Result1 = {result1}");
 
         // Part 2
-        long tot2 = 0;
-
-        var result2 = GetMaxCalories(model.Rows);
-        tot2 += result2.Item1;
-
-        result2 = GetMaxCalories(model.Rows, result2.Item1);
-        tot2 += result2.Item1;
-
-        result2 = GetMaxCalories(model.Rows, result2.Item1);
-        tot2 += result2.Item1;
-
-        result2 = (tot2, 0);
+        var result2 = (CaloriesByElf(model).Take(3).Select(e => e.Item1).Sum(), 0);
 
         Console.WriteLine($"Result2 = {result2}");
 
