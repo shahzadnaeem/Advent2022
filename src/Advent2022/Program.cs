@@ -1,7 +1,9 @@
-﻿using Advent2022Lib;
+﻿using Advent2022;
 
-var calc = new AClass("Meeee");
+var day = DateTime.Now.Day;
 
-Console.WriteLine("Hey!");
-Console.WriteLine($"calc={calc}");
-Console.WriteLine("See you later...");
+Utils.Title($"Advent of Code 2022 - Day {day}");
+
+Utils.Day(1);
+Utils.Result($"Answer = {new Day1().Answer().ToString()}");
+

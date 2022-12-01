@@ -1,4 +1,4 @@
-using Advent2022Lib;
+using Advent2022;
 using Xunit;
 
 namespace Advent2022Lib.Tests;

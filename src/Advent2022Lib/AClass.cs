@@ -1,4 +1,4 @@
-﻿namespace Advent2022Lib;
+﻿namespace Advent2022;
 
 public class AClass
 {
