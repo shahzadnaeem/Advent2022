@@ -5,6 +5,8 @@ public class DayN
     public class Model
     {
         private string Data { get; set; } = "";
+        // TODO: Define and initialise...
+        public long Rows { get; init; } = 0;
 
         public Model(string input)
         {
@@ -29,9 +31,9 @@ public class DayN
 
     public (long, long) Answer()
     {
-        var input = GetModel();
+        var model = GetModel();
 
-        Console.WriteLine($"INPUT = {input}");
+        Console.WriteLine($"#ROWS = TODO:{model.Rows}");
 
         // Part 1
         var result1 = (0, 0);
@@ -44,6 +46,6 @@ public class DayN
         Console.WriteLine($"Result2 = {result2}");
 
         // Final result in a tuple
-        return (result1.Item2, result2.Item2);
+        return (result1.Item1, result2.Item1);
     }
 }
