@@ -5,17 +5,28 @@ public class DayN
     public class Model
     {
         private string Data { get; set; } = "";
+
         // TODO: Define and initialise...
         public long Rows { get; init; } = 0;
 
         public Model(string input)
         {
             Data = input;
+
+            // TODO: Preprocessing for Part1 and Part2 below
+        }
+
+        // TODO: Helper/calculation methods as required
+        public long LookupSomething()
+        {
+            // TODO: Stuff...
+            return -1;
         }
 
 
         public override string ToString()
         {
+            // TODO: Additional details?
             return Data;
         }
     }
@@ -29,21 +40,31 @@ public class DayN
         return new Model(DayNData.INPUT);
     }
 
+    private long Part1(Model model)
+    {
+        return -1;
+    }
+
+    private long Part2(Model model)
+    {
+        return -1;
+    }
+
     public (long, long) Answer()
     {
         var model = GetModel();
 
-        Console.WriteLine($"#ROWS = TODO:{model.Rows}");
+        Console.WriteLine($"#ROWS = {model.Rows}");
 
         // Part 1
-        var result1 = (0, 0);
+        var result1 = (Part1(model), 0);
 
-        Console.WriteLine($"Result1 = {result1}");
+        Console.WriteLine($"Part 1 = {result1}");
 
         // Part 2
-        var result2 = (0, 0);
+        var result2 = (Part2(model), 0);
 
-        Console.WriteLine($"Result2 = {result2}");
+        Console.WriteLine($"Part 2 = {result2}");
 
         // Final result in a tuple
         return (result1.Item1, result2.Item1);
