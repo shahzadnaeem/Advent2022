@@ -35,18 +35,16 @@ public class Day3
 
                 if (i > 0 && (i + 1) % 3 == 0)
                 {
-                    var is1 = groupTracker[0].Intersect(groupTracker[1]);
-                    var is2 = groupTracker[1].Intersect(groupTracker[2]);
-                    var is3 = is1.Intersect(is2);
+                    var intersection = groupTracker[0].Intersect(groupTracker[1]).Intersect(groupTracker[2]);
 
-                    if (is3.Count() == 0)
+                    if (intersection.Count() == 0)
                     {
                         throw new Exception($"No common item in three elf group! #{i / 3}");
                     }
 
                     var fullLine = string.Join(' ', groupTracker);
 
-                    groupedRows.Add((fullLine, is3.First()));
+                    groupedRows.Add((fullLine, intersection.First()));
 
                     groupTracker = groupTracker.Select(_ => "").ToArray();
                 }
