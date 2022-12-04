@@ -2,12 +2,18 @@ namespace Advent2022;
 
 public class DayN
 {
+    enum DataType
+    {
+        INPUT,
+        SAMPLE
+    }
+
     public class Model
     {
         private string Data { get; set; } = "";
 
         // TODO: Define and initialise...
-        public long Rows { get; init; } = 0;
+        public long[] Rows { get; init; } = null!;
 
         public Model(string input)
         {
@@ -35,9 +41,9 @@ public class DayN
     {
     }
 
-    private Model GetModel()
+    private Model GetModel(DataType which = DataType.INPUT)
     {
-        return new Model(DayNData.INPUT);
+        return new Model(which == DataType.INPUT ? DayNData.INPUT : DayNData.SAMPLE);
     }
 
     private long Part1(Model model)
@@ -54,7 +60,7 @@ public class DayN
     {
         var model = GetModel();
 
-        Console.WriteLine($"#ROWS = {model.Rows}");
+        Console.WriteLine($"#ROWS = {model.Rows.Length}");
 
         // Part 1
         var result1 = (Part1(model), 0);
