@@ -18,6 +18,7 @@ public class DayN
         public Model(string input)
         {
             Data = input;
+            var lines = Data.Split(Environment.NewLine);
 
             // TODO: Preprocessing for Part1 and Part2 below
         }
@@ -48,17 +49,20 @@ public class DayN
 
     private long Part1(Model model)
     {
+        // TODO: ...
         return -1;
     }
 
     private long Part2(Model model)
     {
+        // TODO: ...
         return -1;
     }
 
     public (long, long) Answer()
     {
-        var model = GetModel();
+        // TODO: Start with SAMPLE data
+        var model = GetModel(DataType.SAMPLE);
 
         Console.WriteLine($"#ROWS = {model.Rows.Length}");
 

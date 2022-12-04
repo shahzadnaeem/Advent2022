@@ -120,17 +120,17 @@ public class Day2
     {
         var model = GetModel();
 
-        Console.WriteLine($"#ROWS = {model.Rows.Length}");
+        Console.WriteLine($"Day 2 - #ROWS = {model.Rows.Length}");
 
         // Part 1
         var result1 = (PlayGames(model), model.Rows.Length);
 
-        Console.WriteLine($"Result1 = {result1}");
+        Console.WriteLine($"Part 1 = {result1}");
 
         // Part 2
         var result2 = (PlayGames2(model), model.Rows.Length);
 
-        Console.WriteLine($"Result2 = {result2}");
+        Console.WriteLine($"Part 2 = {result2}");
 
         // Final result in a tuple
         return (result1.Item1, result2.Item1);

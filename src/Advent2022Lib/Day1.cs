@@ -67,17 +67,17 @@ public class Day1
         var model = GetModel();
 
         // Console.WriteLine($"ROWS = {model}");
-        Console.WriteLine($"#ROWS = {model.Rows.Length}");
+        Console.WriteLine($"Day 1 - #ROWS = {model.Rows.Length}");
 
         // Part 1
         var result1 = CaloriesByElf(model).Take(1).Single();
 
-        Console.WriteLine($"Result1 = {result1}");
+        Console.WriteLine($"Part 1 = {result1}");
 
         // Part 2
         var result2 = (CaloriesByElf(model).Take(3).Select(e => e.Item1).Sum(), 0);
 
-        Console.WriteLine($"Result2 = {result2}");
+        Console.WriteLine($"Part 2 = {result2}");
 
         // Final result in a tuple
         return (result1.Item1, result2.Item1);

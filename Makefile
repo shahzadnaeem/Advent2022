@@ -4,6 +4,7 @@ TESTS=tests
 PROJECT=$(SRC)/Advent2022
 LIB_PROJECT=$(SRC)/Advent2022Lib
 TEST_PROJECT=$(TESTS)/Advent2022.Tests
+TEST_OPTIONS=--filter FullyQualifiedName!=Advent2022Lib.Tests.DayNTests.ATest
 TEST_RESULTS=$(TEST_PROJECT)/TestResults
 TEST_REPORT=$(TEST_PROJECT)/TestReport
 
@@ -23,7 +24,7 @@ watch run:
 	$(DOTNET) $@ --project $(PROJECT)
 
 test:
-	$(DOTNET) test $(TEST_PROJECT)
+	$(DOTNET) test $(TEST_OPTIONS) $(TEST_PROJECT)
 
 coverage:
 	rm -rf $(TEST_RESULTS)
