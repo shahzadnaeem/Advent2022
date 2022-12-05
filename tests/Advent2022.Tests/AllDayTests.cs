@@ -52,4 +52,16 @@ public class AllDayTests
 
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void Day5Test()
+    {
+        var day = new Day5();
+
+        // contained, overlapping
+        var expected = ("WHTLRMZRC", "GMPMLWNMG");
+        var result = day.Answer();
+
+        Assert.Equal(expected, result);
+    }
 }

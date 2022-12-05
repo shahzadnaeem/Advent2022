@@ -31,11 +31,8 @@ public class Day5
             NumStacks = splitter.Split(lines[crateIdentLineNo].Trim()).Length;
 
             Items = lines.Take(crateIdentLineNo)
-                .Select(l => Regex.Replace(l, @"\s\s\s", " ."))
-                .Select(l => Regex.Replace(l, @"^\s", ""))
                 .Select(l => Regex.Replace(l, @"[\[\]]", ""))
-                .Select(l => Regex.Replace(l, @"\s\s", " "))
-                .Select(l => l.Trim())
+                .Select(l => Regex.Replace(l, @"\s\s\s\s", " ."))
                 .ToArray();
 
             // Console.WriteLine($"> NumStacks={NumStacks}");
@@ -49,7 +46,7 @@ public class Day5
             {
                 var splitRow = row.Split(' ').Select((it, ix) => (it, ix));
 
-                Console.WriteLine($"> Row='{row}'");
+                // Console.WriteLine($"> Row='{row}'");
 
                 foreach (var (it, sx) in splitRow)
                 {
@@ -103,6 +100,8 @@ public class Day5
                 sw.WriteLine(line);
             }
 
+            sw.WriteLine($"TOP = {GetTop()}");
+
             return sw.ToString();
 
         }
@@ -134,17 +133,17 @@ public class Day5
     {
         foreach (var cmd in model.Commands)
         {
-            var stackToReverse = new List<char>();
+            var poppedItems = new List<char>();
 
             for (var i = 0; i < cmd.Item1; i++)
             {
                 var item = model.Stacks[cmd.Item2 - 1].Pop();
-                stackToReverse.Add(item);
+                poppedItems.Add(item);
             }
 
-            stackToReverse.Reverse();
+            poppedItems.Reverse();
 
-            foreach (var item in stackToReverse)
+            foreach (var item in poppedItems)
             {
                 model.Stacks[cmd.Item3 - 1].Push(item);
             }
@@ -155,13 +154,10 @@ public class Day5
 
     public (string, string) Answer()
     {
-        // TODO: Start with SAMPLE data
         var model = GetModel(DataType.INPUT);
 
-        Console.WriteLine(model);
-        Console.WriteLine($"# Stacks = {model.NumStacks}");
-        Console.WriteLine($"# Commands = {model.Commands.Length}");
-        Console.WriteLine($"# START = {model.GetTop()}");
+        // Console.WriteLine(model);
+        Console.WriteLine($"Day 5 - #Stacks = {model.NumStacks}, #Commands = {model.Commands.Length}, START={model.GetTop()}");
 
         // Part 1
         var result1 = (Part1(model), 0);
