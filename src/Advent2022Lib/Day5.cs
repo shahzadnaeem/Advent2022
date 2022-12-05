@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Sprache;
 
 namespace Advent2022;
 
@@ -14,11 +15,9 @@ public class Day5
     {
         private string Data { get; set; } = "";
 
-        // TODO: Define and initialise...
         public string[] Items { get; init; } = null!;
         public (int, int, int)[] Commands { get; init; } = null!;
 
-        public int NumStacks { get; init; } = 0!;
         public Stack<char>[] Stacks { get; init; } = null!;
 
         public Model(string input)
@@ -26,21 +25,16 @@ public class Day5
             Data = input;
             var lines = Data.Split(Environment.NewLine);
 
-            var crateIdentLineNo = lines.ToList().FindIndex(l => l.Contains(" 1"));
-            var splitter = new Regex(@"\s+");
-            NumStacks = splitter.Split(lines[crateIdentLineNo].Trim()).Length;
+            var stacksIdentLineNo = lines.ToList().FindIndex(l => l == "") - 1;
 
-            Items = lines.Take(crateIdentLineNo)
+            Stacks = ParseStacks(lines[stacksIdentLineNo]);
+
+            Items = lines.Take(stacksIdentLineNo)
                 .Select(l => Regex.Replace(l, @"[\[\]]", ""))
                 .Select(l => Regex.Replace(l, @"\s\s\s\s", " ."))
                 .ToArray();
 
-            // Console.WriteLine($"> NumStacks={NumStacks}");
-
-            // Create the required number of stacks
-            Stacks = new Stack<char>[NumStacks]
-                .Select(x => new Stack<char>())
-                .ToArray();
+            // Console.WriteLine($"> NumStacks={Stacks.Length}");
 
             foreach (var (row, i) in Items.Reverse().Select((it, ix) => (it, ix)))
             {
@@ -57,12 +51,42 @@ public class Day5
                 }
             }
 
-            Commands = lines.Skip(crateIdentLineNo + 2)
-                .Select(l => Regex.Replace(l, @"(move|from|to)\s", ""))
-                .Select(l => l.Split(' '))
-                .Select(xs => (int.Parse(xs[0]), int.Parse(xs[1]), int.Parse(xs[2])))
-                .ToArray();
+            // Convert lines back to a string as we are using a parser now
+            Commands = ParseCommands(String.Join(Environment.NewLine, lines.Skip(stacksIdentLineNo + 2)));
         }
+
+        public Stack<char>[] ParseStacks(string line)
+        {
+            var parser =
+                from _s in Parse.Regex(@"\s+").Optional()
+                from stacks in Parse.Number.Select(int.Parse).DelimitedBy(Parse.Regex(@"\s+")).Optional()
+                from _t in Parse.Regex(@"\s+").Optional()
+                select stacks.GetOrElse(new int[] { });
+
+            return parser.Parse(line)
+                    .Select(x => new Stack<char>())
+                    .ToArray();
+        }
+
+        public (int, int, int)[] ParseCommands(string lines)
+        {
+            var command =
+                from _m in Parse.String("move").Token()
+                from n in Parse.Number.Token().Select(int.Parse)
+                from _fr in Parse.String("from").Token()
+                from fr in Parse.Number.Token().Select(int.Parse)
+                from _to in Parse.String("to").Token()
+                from too in Parse.Number.Token().Select(int.Parse)
+                select (n, fr, too);
+
+            // Multiple commands parser - needs a single input string
+            var commands =
+                from cmds in Parse.Ref(() => command).Many().End()
+                select cmds;
+
+            return commands.Parse(lines).ToArray();
+        }
+
 
         public string GetTop()
         {
@@ -86,7 +110,7 @@ public class Day5
         {
             StringWriter sw = new();
 
-            sw.WriteLine($"# Stacks = {NumStacks}");
+            sw.WriteLine($"# Stacks = {Stacks.Length}");
             sw.WriteLine("Items");
             foreach (var line in Items)
             {
@@ -157,7 +181,7 @@ public class Day5
         var model = GetModel(DataType.INPUT);
 
         // Console.WriteLine(model);
-        Console.WriteLine($"Day 5 - #Stacks = {model.NumStacks}, #Commands = {model.Commands.Length}, START={model.GetTop()}");
+        Console.WriteLine($"Day 5 - #Stacks = {model.Stacks.Length}, #Commands = {model.Commands.Length}, START={model.GetTop()}");
 
         // Part 1
         var result1 = (Part1(model), 0);
