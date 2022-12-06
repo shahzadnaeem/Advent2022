@@ -3,6 +3,7 @@ namespace Advent2022;
 public class Utils
 {
     public const int YEAR = 2022;
+    public const int ADVENT = 12;
 
     public static void White() { Console.ForegroundColor = ConsoleColor.White; }
     public static void Red() { Console.ForegroundColor = ConsoleColor.Red; }
@@ -42,7 +43,7 @@ public class Utils
     public static void Day(int day)
     {
         var adventDay = DateTime.Now.Day;
-        var live = DateTime.Now.Month == 12 && DateTime.Now.Year == YEAR;
+        var live = DateTime.Now.Month == ADVENT && DateTime.Now.Year == YEAR;
 
         if (live && adventDay == day)
         {
