@@ -55,6 +55,13 @@ public class Day5
             Commands = ParseCommands(String.Join(Environment.NewLine, lines.Skip(stacksIdentLineNo + 2)));
         }
 
+        public string[] ParseItems(string lines)
+        {
+            // TODO: Not sure this will do much more than the above
+
+            return new string[] { };
+        }
+
         public Stack<char>[] ParseStacks(string line)
         {
             var parser =

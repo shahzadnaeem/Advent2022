@@ -21,14 +21,14 @@ clean:
 	rm -rf $(TEST_RESULTS) $(TEST_REPORT)
 
 watch run:
-	$(DOTNET) $@ --project $(PROJECT)
+	$(DOTNET) $@ --project $(PROJECT) $(RUN_ARGS)
 
 test:
-	$(DOTNET) test $(TEST_OPTIONS) $(TEST_PROJECT)
+	$(DOTNET) test $(TEST_OPTIONS) $(TEST_PROJECT) $(TEST_ARGS)
 
 coverage:
 	rm -rf $(TEST_RESULTS)
-	$(DOTNET) test $(TEST_PROJECT) --collect "Xplat Code Coverage"
+	$(DOTNET) test $(TEST_PROJECT) $(TEST_ARGS) --collect "Xplat Code Coverage"
 
 coverage-report: coverage
 	$(COVERAGE_REPORTER) $(TEST_PROJECT)

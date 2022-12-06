@@ -2,6 +2,8 @@ namespace Advent2022;
 
 public class Utils
 {
+    public const int YEAR = 2022;
+
     public static void White() { Console.ForegroundColor = ConsoleColor.White; }
     public static void Red() { Console.ForegroundColor = ConsoleColor.Red; }
     public static void Green() { Console.ForegroundColor = ConsoleColor.Green; }
@@ -40,7 +42,7 @@ public class Utils
     public static void Day(int day)
     {
         var adventDay = DateTime.Now.Day;
-        var live = DateTime.Now.Month == 12 && DateTime.Now.Year == 2021;
+        var live = DateTime.Now.Month == 12 && DateTime.Now.Year == YEAR;
 
         if (live && adventDay == day)
         {
@@ -56,5 +58,39 @@ public class Utils
     {
         Utils.White();
         Console.WriteLine(result);
+    }
+
+    public static string PrepInput(string input, int chunkSize)
+    {
+        int numChunks = input.Length / chunkSize + Math.Sign(input.Length % chunkSize);
+
+        var sw = new StringWriter();
+
+        sw.WriteLine(@"public const string INPUT =");
+        for (int chunk = 0; chunk < numChunks; chunk++)
+        {
+            int lastChunkSize = input.Length % chunkSize == 0 ? chunkSize : input.Length % chunkSize;
+            bool lastChunk = chunk == numChunks - 1;
+
+            var line = input.Substring(chunk * chunkSize, lastChunk ? lastChunkSize : chunkSize);
+
+            sw.Write($"\"{line}\"");
+
+            sw.WriteLine(lastChunk ? ";" : "+");
+        }
+
+        return sw.ToString();
+    }
+
+    public static string PrepInputFile(string path, int chunkSize)
+    {
+        var input = GetFileContents(path);
+
+        return PrepInput(input, chunkSize);
+    }
+
+    public static string GetFileContents(string path)
+    {
+        return System.IO.File.ReadAllText(path);
     }
 }
