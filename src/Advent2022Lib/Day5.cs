@@ -57,7 +57,7 @@ public class Day5
 
         public string[] ParseItems(string lines)
         {
-            // TODO: Not sure this will do much more than the above
+            // TODO: Not sure this will do much more than the above, so maybe later :)
 
             return new string[] { };
         }

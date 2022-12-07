@@ -15,21 +15,10 @@ public class Day6
         public Model(string input)
         {
             Data = input;
-
-            // TODO: Preprocessing for Part1 and Part2 below
         }
-
-        // TODO: Helper/calculation methods as required
-        public long LookupSomething()
-        {
-            // TODO: Stuff...
-            return -1;
-        }
-
 
         public override string ToString()
         {
-            // TODO: Additional details?
             return Data;
         }
     }
@@ -66,7 +55,6 @@ public class Day6
 
     public (long, long) Answer()
     {
-        // TODO: Start with SAMPLE data
         var model = GetModel(DataType.INPUT);
 
         Console.WriteLine($"Day 6 - #CHARS = {model.Data.Length}");

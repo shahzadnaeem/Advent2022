@@ -12,7 +12,6 @@ public class Day4
     {
         private string Data { get; set; } = "";
 
-        // TODO: Define and initialise...
         public ((int, int), (int, int))[] Rows { get; init; } = null!;
 
         public Model(string input)
@@ -26,8 +25,6 @@ public class Day4
                 return (ParseRange(pairs[0]), ParseRange(pairs[1]));
             })
             .ToArray();
-
-            // TODO: Preprocessing for Part1 and Part2 below
         }
 
         private (int, int) ParseRange(string range)
@@ -38,14 +35,6 @@ public class Day4
 
             return (digits[0], digits[1]);
         }
-
-        // TODO: Helper/calculation methods as required
-        public long LookupSomething()
-        {
-            // TODO: Stuff...
-            return -1;
-        }
-
 
         public override string ToString()
         {

@@ -58,7 +58,7 @@ public class AllDayTests
     {
         var day = new Day5();
 
-        // contained, overlapping
+        // stacks top, stacks top CrateMover 9001
         var expected = ("WHTLRMZRC", "GMPMLWNMG");
         var result = day.Answer();
 
@@ -70,8 +70,20 @@ public class AllDayTests
     {
         var day = new Day6();
 
-        // contained, overlapping
+        // start packet, start message
         var expected = (1210, 3476);
+        var result = day.Answer();
+
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void Day7Test()
+    {
+        var day = new Day7();
+
+        // sum, min free dir
+        var expected = (1886043, 3842121);
         var result = day.Answer();
 
         Assert.Equal(expected, result);
