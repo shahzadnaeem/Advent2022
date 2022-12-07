@@ -2,7 +2,21 @@
 
 if (args.Length > 0)
 {
-    RunInputPrep(args);
+    if (args[0] == "prep")
+    {
+        RunInputPrep(args);
+    }
+    else if (args[0] == "parse")
+    {
+        var day7parser = new Day7Parser();
+
+        day7parser.Run();
+    }
+    else
+    {
+        Console.WriteLine($"ERROR: Don't know how to '{args[0]}'");
+    }
+
 }
 else
 {

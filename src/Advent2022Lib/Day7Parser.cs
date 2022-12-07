@@ -1,8 +1,9 @@
 using System.Text.RegularExpressions;
+using Sprache;
 
 namespace Advent2022;
 
-public class Day7
+public class Day7Parser
 {
     enum DataType
     {
@@ -10,9 +11,24 @@ public class Day7
         SAMPLE
     }
 
+    public class Entry
+    {
+        public string Type { get; init; } = null!;
+        public string Name { get; init; } = null!;
+        public string[] Values { get; init; } = null!;
+
+        public Entry(string type, string name, string[] values)
+        {
+            Type = type;
+            Name = name;
+            Values = values;
+        }
+    }
+
+
     public class Model
     {
-        private string Data { get; set; } = "";
+        public string Data { get; init; } = null!;
 
         public string[] Lines { get; init; } = null!;
 
@@ -28,7 +44,7 @@ public class Day7
         }
     }
 
-    public Day7()
+    public Day7Parser()
     {
     }
 
@@ -131,58 +147,104 @@ public class Day7
         return result;
     }
 
-    private long Part1(Model model, bool debug = false)
+    private Entry[] ParseModel(Model model)
     {
-        var results = ProcessInput(model);
+        var command_p = Parse.Char('$').Token().Then(_ => Parse.LetterOrDigit.Many().Token().Text());
 
-        foreach (var (k, v) in results)
-        {
-            if (debug) Console.WriteLine($"{k}: {v} bytes");
-        }
+        var value_p = (Parse.AnyChar.Except(Parse.WhiteSpace)).Many().Token().Text();
 
-        long sum = results.Where(kvp => kvp.Value < 100000).Select(kvp => kvp.Value).Sum();
+        var cmd_p =
+            from command in command_p
+            from values in value_p.Many().End().Select(items => items.ToArray())
+            select new Entry("$", command, values);
 
-        return sum;
-    }
+        var dir_p =
+            from dir in Parse.String("dir").Token().Text()
+            from name in Parse.AnyChar.Many().Token().Text().Once().End()
+            select new Entry("#", dir, new string[] { name.Single() });
 
-    private long Part2(Model model, DataType dataType)
-    {
-        var results = ProcessInput(model);
+        var file_p =
+            from size in Parse.Numeric.Many().Token().Text()
+            from name in Parse.AnyChar.Many().Token().Text().Once().End()
+            select new Entry("F", name.Single(), new string[] { size.ToString() });
 
-        var currFreeSpace = 70000000L - results["/"];
-        var minRequired = 30000000 - currFreeSpace;
+        var wildcard_p =
+            from theRest in Parse.AnyChar.Many().Text().End()
+            select new Entry("!", "TODO", new string[] { theRest });
 
-        var limit = dataType == DataType.INPUT ? minRequired : 100000L;
+        var commands_p =
+            from cmd in cmd_p.Or(dir_p).Or(file_p).Or(wildcard_p)
+            select cmd;
 
-        var result = results
-            .Where(kvp => kvp.Value >= limit)
-            .Select(kvp => kvp.Value)
-            .OrderBy(v => v)
-            .Take(1)
-            .Single();
+        var result = model.Lines.Select(line => commands_p.Parse(line)).ToArray();
 
         return result;
     }
 
-    public (long, long) Answer()
+    public void Run()
     {
-        var dataType = DataType.INPUT;
+        var dataType = DataType.SAMPLE;
 
         var model = GetModel(dataType);
 
         Console.WriteLine($"#LINES = {model.Lines.Length}");
 
-        // Part 1
-        var result1 = (Part1(model), 0);
+        var entries = ParseModel(model);
 
-        Console.WriteLine($"Part 1 = {result1}");
+        Console.WriteLine($"Number of parsed lines: {entries.Length}");
+        var Cwd = new Stack<string>();
+        var DirTotals = new Dictionary<string, long>();
+        var currentDir = "";
+        var prevDir = "";
 
-        // Part 2
-        var result2 = (Part2(model, dataType), 0);
+        foreach (var (e, i) in entries.Select((e, i) => (e, i)))
+        {
+            currentDir = "/" + string.Join('/', Cwd.ToArray().Reverse().Skip(1));
 
-        Console.WriteLine($"Part 2 = {result2}");
+            if (currentDir != prevDir)
+            {
+                Console.WriteLine($"CWD: {currentDir}");
+                prevDir = currentDir;
+            }
 
-        // Final result in a tuple
-        return (result1.Item1, result2.Item1);
+            if (e.Name == "cd")
+            {
+                var dir = e.Values.Single();
+
+                if (dir == "/")
+                {
+                    Cwd.Clear();
+                    Cwd.Push(dir);
+                }
+                else if (dir == "..")
+                {
+                    Cwd.Pop();
+                }
+                else
+                {
+                    Cwd.Push(dir);
+                }
+            }
+            else if (e.Type == "F")
+            {
+                var bytes = long.Parse(e.Values.Single());
+
+                if (!DirTotals.ContainsKey(currentDir))
+                {
+                    DirTotals.Add(currentDir, 0L);
+                }
+
+                foreach (var key in DirTotals.Keys)
+                {
+                    if (currentDir.StartsWith(key))
+                    {
+                        DirTotals[key] += bytes;
+                    }
+                }
+
+                Console.WriteLine($"F: {(currentDir != "/" ? currentDir : "")}/{e.Name}  {bytes}");
+                Console.WriteLine($"TOTAL: {DirTotals["/"]}");
+            }
+        }
     }
 }
