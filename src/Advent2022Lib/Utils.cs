@@ -61,6 +61,8 @@ public class Utils
         Console.WriteLine(result);
     }
 
+    // Create a multi line C# string from a VERY long string, split into 'chunkSize' chunks
+    //   VSCode really does not like VERY long strings! (4095 chars when spotted)
     public static string PrepInput(string input, int chunkSize)
     {
         int numChunks = input.Length / chunkSize + Math.Sign(input.Length % chunkSize);
