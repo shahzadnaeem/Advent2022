@@ -12,24 +12,29 @@ public class Day8
     {
         private string Data { get; set; } = "";
 
-        public string[] Lines { get; init; } = null!;
         public int Width { get; init; } = 0!;
         public int Height { get; init; } = 0!;
+
+        public int[,] Forest { get; init; } = null!;
 
         public Model(string input)
         {
             Data = input;
-            Lines = Data.Split(Environment.NewLine);
+            var lines = Data.Split(Environment.NewLine);
 
-            Width = Lines[0].Length;
-            Height = Lines.Length;
+            Width = lines[0].Length;
+            Height = lines.Length;
+
+            Forest = new int[Width, Height];
+
+            foreach (var (l, y) in lines.Select((l, y) => (l, y)))
+                foreach (var (c, x) in l.ToArray().Select((c, x) => (c, x)))
+                    Forest[x, y] = c - '0';
         }
 
         public int TreeHeight(int x, int y)
         {
-            var row = Lines[y];
-            var height = int.Parse($"{row[x]}");
-            return height;
+            return Forest[x, y];
         }
 
         public bool TreeIsVisible(int x, int y)
@@ -122,7 +127,7 @@ public class Day8
                 if (h >= height) break;
             }
 
-            return scores[0] * scores[1] * scores[2] * scores[3];
+            return scores.Aggregate(1, (acc, curr) => acc *= curr);
         }
 
         public int VisibleTrees()
