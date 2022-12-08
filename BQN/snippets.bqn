@@ -22,7 +22,14 @@ FlipSplitAt ← { 𝕨 (↑˜⋈↓˜) 𝕩 }
                                                  # window
 Solution2 ← {(𝕨 ⋈ 𝕩) ⋈ 𝕩 (↑˜⋈↓˜) ⊑ 𝕨+𝕨⊐˜ ≠∘⍷¨ <˘ 𝕨↕𝕩}
 
-Solution ← {⊑ 𝕨+𝕨⊐˜ ≠∘⍷¨ <˘ 𝕨↕𝕩}
+Solution0 ← {⊑ 𝕨+𝕨⊐˜ ≠∘⍷¨ <˘ 𝕨↕𝕩}
+# Optimised
+Solution ← {⊑ 𝕨+𝕨⊐˜ ≠∘⍷˘ 𝕨↕𝕩}
 
-•Show 4 Solution data
-      14 Solution data
+# •Show allows intermediate values to be displayed, otherwise only last one is
+
+•Show 14 SplitAt data
+•Show 3 SplitAt¨ 10 SplitAt data
+
+•Show 4 Solution2 data
+14 Solution2 data
