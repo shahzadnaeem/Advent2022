@@ -170,7 +170,7 @@ public class Day7
 
         var model = GetModel(dataType);
 
-        Console.WriteLine($"#LINES = {model.Lines.Length}");
+        Console.WriteLine($"Day 7 - #LINES = {model.Lines.Length}");
 
         // Part 1
         var result1 = (Part1(model), 0);

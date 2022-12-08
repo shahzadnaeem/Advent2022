@@ -88,4 +88,16 @@ public class AllDayTests
 
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void Day8Test()
+    {
+        var day = new Day8();
+
+        // visible, best scenic score
+        var expected = (1859, 332640);
+        var result = day.Answer();
+
+        Assert.Equal(expected, result);
+    }
 }
