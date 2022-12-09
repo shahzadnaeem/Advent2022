@@ -103,13 +103,15 @@ public class Day9
 
             foreach ((char D, int C) inst in Instructions)
             {
-                Console.WriteLine($"Instruction: {inst}");
+                // Console.WriteLine($"Instruction: {inst}");
 
                 for (var i = 0; i < inst.C; i++)
                 {
                     var newHead = Step(head, inst.D);
 
                     var delta = Delta(newHead, tail);
+
+                    // Work out offset (delta to apply) for Tail relative to Head (which is not how I was doing this)
 
                     var offset = delta switch
                     {
@@ -146,10 +148,12 @@ public class Day9
             return sw.ToString();
         }
 
+        // NOTE: Also from this! https://github.com/betaveros/advent-of-code-2022/blob/main/p9.noul
+
         public List<(int, int)> ApplyStepToRope(List<(int, int)> rope, (int, int) newHeadPos, int numKnots)
         {
-            Console.WriteLine($"  HEAD: {rope[0]} -> {newHeadPos}");
-            Console.WriteLine($"    ROPE:    {RopeToString(rope)}");
+            // Console.WriteLine($"  HEAD: {rope[0]} -> {newHeadPos}");
+            // Console.WriteLine($"    ROPE:    {RopeToString(rope)}");
 
             var newRope = new List<(int, int)>();
 
@@ -157,29 +161,34 @@ public class Day9
 
             for (int i = 1; i < numKnots; i++)
             {
-                var dist = Distance(rope[i], newRope[i - 1]);
+                var newPos = newRope[i - 1];
+                var delta = Delta(newPos, rope[i]);
 
-                if (dist >= 2)
-                {
-                    // TODO: Need to check for possible diagnoal movement!
+                // More complex offset calculation for 2nd case
 
-                    newRope.Add(rope[i - 1]);
-                }
-                else
+                var offset = delta switch
                 {
-                    newRope.Add(rope[i]);
-                }
+                    (2, 2) => (1, 1),
+                    (2, -2) => (1, -1),
+                    (-2, 2) => (-1, 1),
+                    (-2, -2) => (-1, -1),
+                    (2, _) => (1, 0),
+                    (-2, _) => (-1, 0),
+                    (_, 2) => (0, 1),
+                    (_, -2) => (0, -1),
+                    _ => delta
+                };
+
+                newRope.Add((newPos.Item1 + offset.Item1, newPos.Item2 + offset.Item2));
             }
 
-            Console.WriteLine($"    NEWROPE: {RopeToString(newRope)}");
+            // Console.WriteLine($"    NEWROPE: {RopeToString(newRope)}");
 
             return newRope;
         }
 
         public long TailPositionsVisited(int numKnots)
         {
-            return -1;
-
             int HEAD = 0;
             int TAIL = numKnots - 1;
 
@@ -188,15 +197,13 @@ public class Day9
             var rope = new List<(int, int)>();
             rope.AddRange(Enumerable.Range(0, numKnots).Select(_ => (0, 0)));
 
-            Console.WriteLine($"#KNOTS = {rope.Count()}");
-
             positions.Add(rope[HEAD]);
 
-            Console.WriteLine($"Knots = {numKnots}, Head = {rope[HEAD]}, Tail = {rope[TAIL]}");
+            // Console.WriteLine($"Knots = {numKnots}, Head = {rope[HEAD]}, Tail = {rope[TAIL]}");
 
             foreach ((char D, int C) inst in Instructions)
             {
-                Console.WriteLine($"instruction: {inst}");
+                // Console.WriteLine($"instruction: {inst}");
 
                 var origRope = rope.ToList();
 
@@ -240,12 +247,12 @@ public class Day9
 
     private long Part2(Model model)
     {
-        return model.TailPositionsVisitedV2();
+        return model.TailPositionsVisited(10);
     }
 
     public (long, long) Answer()
     {
-        var model = GetModel(DataType.SAMPLE);
+        var model = GetModel(DataType.INPUT);
 
         Console.WriteLine($"Day 9 - #INSTRUCTIONS = {model.Instructions.Length}");
 
