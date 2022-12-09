@@ -88,7 +88,7 @@ public class Day9
                 }
             }
 
-            return positions.Count();
+            return positions.Count;
         }
 
         private string RopeToString(List<(int, int)> rope)
@@ -105,28 +105,63 @@ public class Day9
             return sw.ToString();
         }
 
-        //  TODO: Nooooooo, not enough information to do this right. Pass!
-        private string RopeToBoardString(List<(int, int)> rope)
+        private char PosToSym(int i, int count)
+        {
+            char sym;
+
+            if (i == 0)
+            {
+                sym = 'H';
+            }
+            else
+            {
+                if (i != count - 1)
+                {
+                    sym = (char)((int)'1' + i);
+                }
+                else
+                {
+                    sym = 'T';
+                }
+            }
+
+            return sym;
+        }
+
+        //  TODO: Hard coded dimensions. Need to calculate by using processing instructions
+        private string RopeToBoardString(List<(int, int)> rope, List<int> diagMoveKnots, bool large = false)
         {
             var sw = new StringWriter();
 
-            var minX = Math.Min(0, rope.Min(kn => kn.Item1));
-            var maxX = rope.Max(kn => kn.Item1);
+            // var minX = rope.Min(kn => kn.Item1);
+            // var maxX = rope.Max(kn => kn.Item1);
 
-            var minY = Math.Min(0, rope.Min(kn => kn.Item2));
-            var maxY = rope.Max(kn => kn.Item2);
+            // var minY = rope.Min(kn => kn.Item2);
+            // var maxY = rope.Max(kn => kn.Item2);
 
-            var boundsX = (minX, maxX);
-            var boundsY = (minY, maxY);
+            // var boundsX = (minX, maxX);
+            // var boundsY = (minY, maxY);
 
-            var width = maxX - minX + 1;
-            var height = maxY - minY + 1;
+            // var width = maxX - minX + 1;
+            // var height = maxY - minY + 1;
 
-            var xo = 11; //(int)((28 - width) / 2) - 1;
-            var yo = 5; //(int)((21 - height) / 2) - 1;
+            // var xo = 11; //(int)((28 - width) / 2) - 1;
+            // var yo = 5; //(int)((21 - height) / 2) - 1;
 
-            width = 26;
-            height = 21;
+            // NOTE: Values that work for the SAMPLE data
+            var width = 26;
+            var height = 21;
+            var xo = 11;
+            var yo = 5;
+
+            if (large)
+            {
+                // TODO: This is not big enough! - even 4x isn't
+                width = 100;
+                height = 200;
+                xo = 30;
+                yo = 20;
+            }
 
             // Console.WriteLine($"width = {width}, height = {height}");
 
@@ -136,31 +171,35 @@ public class Day9
             {
                 for (var x = 0; x < width; x++)
                 {
-                    board[x, y] = '.';
+                    if (y > 0 && y % 5 == 0)
+                    {
+                        board[x, y] = '‥';
+                    }
+                    else if (x > 0 && x % 10 == 0)
+                    {
+                        board[x, y] = '⸽';
+                    }
+                    else
+                    {
+                        board[x, y] = '·';
+                    }
                 }
             }
 
-            board[xo, yo] = 's';
+            board[xo, yo] = '⨂';
 
             foreach (((int x, int y), int i) in rope.Select((k, i) => (k, i)).Reverse())
             {
-                char sym = '.';
+                char sym = PosToSym(i, rope.Count);
 
-                if (i == 0)
-                {
-                    sym = 'H';
-                }
-                else
-                {
-                    sym = (char)((int)'0' + i);
-                }
-
-                var xi = x - minX + xo;
-                var yi = y - minY + yo;
+                var xi = x + xo;
+                var yi = y + yo;
 
                 board[xi, yi] = sym;
             }
 
+            var knots = diagMoveKnots.Select(k => PosToSym(k, rope.Count));
+            Console.WriteLine($"Diagonal moves: {String.Join(' ', knots)}");
 
             // Output the board
             for (var y = height - 1; y >= 0; y--)
@@ -173,12 +212,11 @@ public class Day9
             }
 
             return sw.ToString();
-
         }
 
         // NOTE: Had a look at this - https://github.com/betaveros/advent-of-code-2022/blob/main/p9.noul
 
-        public long TailPositionsVisited(int numKnots)
+        public long TailPositionsVisited(int numKnots, bool debug = false)
         {
             int HEAD = 0;
             int TAIL = numKnots - 1;
@@ -190,18 +228,22 @@ public class Day9
 
             positions.Add(rope[HEAD]);
 
-            Console.WriteLine($"Knots = {numKnots}, Head = {rope[HEAD]}, Tail = {rope[TAIL]}");
+            if (debug)
+                Console.WriteLine($"Knots = {numKnots}, Head = {rope[HEAD]}, Tail = {rope[TAIL]}");
 
-            // Console.WriteLine($"Start\n{RopeToBoardString(rope)}");
+            var iNum = 0;
+            var largeBoard = Instructions.Length > 100;
 
             foreach ((char D, int C) inst in Instructions)
             {
-                // Console.WriteLine($"instruction: {inst}");
+                iNum++;
 
                 for (var i = 0; i < inst.C; i++)
                 {
                     // Update head and then the remaining knots
                     rope[HEAD] = Step(rope[HEAD], inst.D);
+
+                    var diagMovesKnots = new List<int>();
 
                     for (int k = 1; k < numKnots; k++)
                     {
@@ -224,19 +266,48 @@ public class Day9
                             (_, 2) => (0, 1),
                             (_, -2) => (0, -1),
 
+                            // All other cases mean NO change (undo updated prevKnotPos)
                             _ => delta
                         };
 
-                        rope[k] = (prevKnotPos.Item1 + offset.Item1, prevKnotPos.Item2 + offset.Item2);
+                        var newK = (prevKnotPos.Item1 + offset.Item1, prevKnotPos.Item2 + offset.Item2);
+
+                        if (Math.Abs(delta.Item1) + Math.Abs(delta.Item2) == 4)
+                        {
+                            diagMovesKnots.Add(k);
+                            if (debug)
+                                Console.WriteLine($"⇧{k + 1}:{rope[k]} - ⇩{k}:{prevKnotPos} -> ẟ:{offset} => ⇩{k}{newK}");
+                        }
+
+                        rope[k] = newK;
                     }
 
                     positions.Add(rope[TAIL]);
-                }
 
-                // Console.WriteLine($"{RopeToBoardString(rope)}");
+                    if (debug)
+                    {
+                        if (diagMovesKnots.Count == 0)
+                        {
+                            Console.Clear();
+                        }
+
+                        if (diagMovesKnots.Count > 0)
+                            Console.WriteLine();
+
+                        Console.WriteLine($"Instruction: {inst.D} {i + 1}/{inst.C}  [{iNum}/{Instructions.Length}]");
+                        Console.WriteLine($"{RopeToBoardString(rope, diagMovesKnots, largeBoard)}");
+                        if (diagMovesKnots.Count > 0)
+                        {
+                            // Console.WriteLine("Press a key to continue");
+                            // var ch = Console.ReadKey();
+                            Thread.Sleep(1000);
+                        }
+                        Thread.Sleep(50);
+                    }
+                }
             }
 
-            return positions.Count();
+            return positions.Count;
         }
 
 
@@ -244,7 +315,7 @@ public class Day9
         {
             var sw = new StringWriter();
 
-            sw.Write($"{Instructions.Count()} instructions");
+            sw.Write($"{Instructions.Length} instructions");
 
             return sw.ToString();
         }
@@ -264,9 +335,9 @@ public class Day9
         return model.TailPositionsVisited(2);
     }
 
-    private long Part2(Model model)
+    private long Part2(Model model, bool debug = false)
     {
-        return model.TailPositionsVisited(10);
+        return model.TailPositionsVisited(10, debug);
     }
 
     public (long, long) Answer()
