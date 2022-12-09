@@ -52,6 +52,9 @@ void RunAdvent(string[] args)
 
     Utils.Day(8);
     Utils.Result($"Answer = {new Day8().Answer().ToString()}");
+
+    Utils.Day(9);
+    Utils.Result($"Answer = {new Day9().Answer().ToString()}");
 }
 
 void RunInputPrep(string[] args)
