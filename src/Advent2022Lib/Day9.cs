@@ -276,7 +276,7 @@ public class Day9
                         {
                             diagMovesKnots.Add(k);
                             if (debug)
-                                Console.WriteLine($"⇧{k + 1}:{rope[k]} - ⇩{k}:{prevKnotPos} -> ẟ:{offset} => ⇩{k}{newK}");
+                                Console.WriteLine($"⇧{k + 1}:{rope[k]} - ⇩{k}:{prevKnotPos} -> ẟ:{offset} => ⇩{k + 1}{newK}");
                         }
 
                         rope[k] = newK;
