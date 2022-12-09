@@ -105,6 +105,77 @@ public class Day9
             return sw.ToString();
         }
 
+        //  TODO: Nooooooo, not enough information to do this right. Pass!
+        private string RopeToBoardString(List<(int, int)> rope)
+        {
+            var sw = new StringWriter();
+
+            var minX = Math.Min(0, rope.Min(kn => kn.Item1));
+            var maxX = rope.Max(kn => kn.Item1);
+
+            var minY = Math.Min(0, rope.Min(kn => kn.Item2));
+            var maxY = rope.Max(kn => kn.Item2);
+
+            var boundsX = (minX, maxX);
+            var boundsY = (minY, maxY);
+
+            var width = maxX - minX + 1;
+            var height = maxY - minY + 1;
+
+            var xo = 11; //(int)((28 - width) / 2) - 1;
+            var yo = 5; //(int)((21 - height) / 2) - 1;
+
+            width = 26;
+            height = 21;
+
+            // Console.WriteLine($"width = {width}, height = {height}");
+
+            var board = new char[width, height];
+
+            for (var y = 0; y < height; y++)
+            {
+                for (var x = 0; x < width; x++)
+                {
+                    board[x, y] = '.';
+                }
+            }
+
+            board[xo, yo] = 's';
+
+            foreach (((int x, int y), int i) in rope.Select((k, i) => (k, i)).Reverse())
+            {
+                char sym = '.';
+
+                if (i == 0)
+                {
+                    sym = 'H';
+                }
+                else
+                {
+                    sym = (char)((int)'0' + i);
+                }
+
+                var xi = x - minX + xo;
+                var yi = y - minY + yo;
+
+                board[xi, yi] = sym;
+            }
+
+
+            // Output the board
+            for (var y = height - 1; y >= 0; y--)
+            {
+                for (var x = 0; x < width; x++)
+                {
+                    sw.Write(board[x, y]);
+                }
+                sw.WriteLine();
+            }
+
+            return sw.ToString();
+
+        }
+
         // NOTE: Had a look at this - https://github.com/betaveros/advent-of-code-2022/blob/main/p9.noul
 
         public long TailPositionsVisited(int numKnots)
@@ -120,6 +191,8 @@ public class Day9
             positions.Add(rope[HEAD]);
 
             Console.WriteLine($"Knots = {numKnots}, Head = {rope[HEAD]}, Tail = {rope[TAIL]}");
+
+            // Console.WriteLine($"Start\n{RopeToBoardString(rope)}");
 
             foreach ((char D, int C) inst in Instructions)
             {
@@ -159,6 +232,8 @@ public class Day9
 
                     positions.Add(rope[TAIL]);
                 }
+
+                // Console.WriteLine($"{RopeToBoardString(rope)}");
             }
 
             return positions.Count();
