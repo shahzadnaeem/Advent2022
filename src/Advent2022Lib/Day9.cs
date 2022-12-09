@@ -352,6 +352,8 @@ public class Day9
         Console.WriteLine($"Part 1 = {result1}");
 
         // Part 2
+        // NOTE: Add true 2nd parameter to Part to see visualisation
+        //         works only with the following above: var model = GetModel(DataType.SAMPLE)
         var result2 = (Part2(model), 0);
 
         Console.WriteLine($"Part 2 = {result2}");
