@@ -58,7 +58,7 @@ public class Day9
             throw new ArgumentException($"Bad direction: {dir}");
         }
 
-        // NOTE: No longer needed
+        // NOTE: No longer needed - Part1 solution
         public long TailPositionsVisited()
         {
             var positions = new HashSet<(int, int)>();
@@ -91,49 +91,6 @@ public class Day9
             return positions.Count();
         }
 
-        // NOTE: From this! https://github.com/betaveros/advent-of-code-2022/blob/main/p9.noul
-
-        public long TailPositionsVisitedV2()
-        {
-            var positions = new HashSet<(int, int)>();
-
-            (int, int) head = (0, 0);
-            var tail = head;
-
-            positions.Add(head);
-
-            foreach ((char D, int C) inst in Instructions)
-            {
-                // Console.WriteLine($"Instruction: {inst}");
-
-                for (var i = 0; i < inst.C; i++)
-                {
-                    var newHead = Step(head, inst.D);
-
-                    var delta = Delta(newHead, tail);
-
-                    // Work out offset (delta to apply) for Tail relative to Head
-                    var offset = delta switch
-                    {
-                        (2, _) => (1, 0),
-                        (-2, _) => (-1, 0),
-                        (_, 2) => (0, 1),
-                        (_, -2) => (0, -1),
-                        _ => delta
-                    };
-
-                    tail = (newHead.Item1 + offset.Item1, newHead.Item2 + offset.Item2);
-                    positions.Add(tail);
-
-                    Console.WriteLine($"  head: {head}->{newHead}, tail: {tail}, delta: {delta}, offset: {offset}");
-
-                    head = newHead;
-                }
-            }
-
-            return positions.Count();
-        }
-
         private string RopeToString(List<(int, int)> rope)
         {
             var sw = new StringWriter();
@@ -148,7 +105,7 @@ public class Day9
             return sw.ToString();
         }
 
-        // NOTE: Also from this! https://github.com/betaveros/advent-of-code-2022/blob/main/p9.noul
+        // NOTE: Had a look at this - https://github.com/betaveros/advent-of-code-2022/blob/main/p9.noul
 
         public long TailPositionsVisited(int numKnots)
         {
@@ -175,11 +132,11 @@ public class Day9
 
                     for (int k = 1; k < numKnots; k++)
                     {
-                        var currHeadPos = rope[k - 1];
+                        var prevKnotPos = rope[k - 1];
 
-                        var delta = Delta(currHeadPos, rope[k]);
+                        var delta = Delta(prevKnotPos, rope[k]);
 
-                        // More complex offset calculation for 2nd case to include diagonals
+                        // Additional offset calculation cases for diagonal movement
                         var offset = delta switch
                         {
                             // Extra cases for three or more knots
@@ -197,7 +154,7 @@ public class Day9
                             _ => delta
                         };
 
-                        rope[k] = (currHeadPos.Item1 + offset.Item1, currHeadPos.Item2 + offset.Item2);
+                        rope[k] = (prevKnotPos.Item1 + offset.Item1, prevKnotPos.Item2 + offset.Item2);
                     }
 
                     positions.Add(rope[TAIL]);
