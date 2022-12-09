@@ -168,8 +168,6 @@ public class Day9
             {
                 // Console.WriteLine($"instruction: {inst}");
 
-                var origRope = rope.ToList();
-
                 for (var i = 0; i < inst.C; i++)
                 {
                     // Update head and then the remaining knots

@@ -100,4 +100,16 @@ public class AllDayTests
 
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void Day9Test()
+    {
+        var day = new Day9();
+
+        // 2 knot rope, 10 knot rope
+        var expected = (6354, 2651);
+        var result = day.Answer();
+
+        Assert.Equal(expected, result);
+    }
 }
