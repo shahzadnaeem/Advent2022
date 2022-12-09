@@ -35,12 +35,17 @@ public class Day9
             Instructions = instructions.ToArray();
         }
 
+        private (int, int) Delta((int X, int Y) p1, (int X, int Y) p2)
+        {
+            return (p2.X - p1.X, p2.Y - p1.Y);
+
+        }
+
         private double Distance((int X, int Y) p1, (int X, int Y) p2)
         {
-            var dx = p2.X - p1.X;
-            var dy = p2.Y - p1.Y;
+            (int X, int Y) d = Delta(p1, p2);
 
-            return Math.Sqrt(dx * dx + dy * dy);
+            return Math.Sqrt(d.X * d.X + d.Y * d.Y);
         }
 
         private (int, int) Step((int X, int Y) pos, char dir)
@@ -85,6 +90,48 @@ public class Day9
             return positions.Count();
         }
 
+        // NOTE: From this! https://github.com/betaveros/advent-of-code-2022/blob/main/p9.noul
+
+        public long TailPositionsVisitedV2()
+        {
+            var positions = new HashSet<(int, int)>();
+
+            (int, int) head = (0, 0);
+            var tail = head;
+
+            positions.Add(head);
+
+            foreach ((char D, int C) inst in Instructions)
+            {
+                Console.WriteLine($"Instruction: {inst}");
+
+                for (var i = 0; i < inst.C; i++)
+                {
+                    var newHead = Step(head, inst.D);
+
+                    var delta = Delta(newHead, tail);
+
+                    var offset = delta switch
+                    {
+                        (2, _) => (1, 0),
+                        (-2, _) => (-1, 0),
+                        (_, 2) => (0, 1),
+                        (_, -2) => (0, -1),
+                        _ => delta
+                    };
+
+                    tail = (newHead.Item1 + offset.Item1, newHead.Item2 + offset.Item2);
+                    positions.Add(tail);
+
+                    Console.WriteLine($"  head: {head}->{newHead}, tail: {tail}, delta: {delta}, offset: {offset}");
+
+                    head = newHead;
+                }
+            }
+
+            return positions.Count();
+        }
+
         private string RopeToString(List<(int, int)> rope)
         {
             var sw = new StringWriter();
@@ -114,6 +161,8 @@ public class Day9
 
                 if (dist >= 2)
                 {
+                    // TODO: Need to check for possible diagnoal movement!
+
                     newRope.Add(rope[i - 1]);
                 }
                 else
@@ -129,6 +178,8 @@ public class Day9
 
         public long TailPositionsVisited(int numKnots)
         {
+            return -1;
+
             int HEAD = 0;
             int TAIL = numKnots - 1;
 
@@ -189,7 +240,7 @@ public class Day9
 
     private long Part2(Model model)
     {
-        return model.TailPositionsVisited(10);
+        return model.TailPositionsVisitedV2();
     }
 
     public (long, long) Answer()
