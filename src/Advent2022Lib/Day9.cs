@@ -58,6 +58,7 @@ public class Day9
             throw new ArgumentException($"Bad direction: {dir}");
         }
 
+        // NOTE: No longer needed
         public long TailPositionsVisited()
         {
             var positions = new HashSet<(int, int)>();
@@ -111,8 +112,7 @@ public class Day9
 
                     var delta = Delta(newHead, tail);
 
-                    // Work out offset (delta to apply) for Tail relative to Head (which is not how I was doing this)
-
+                    // Work out offset (delta to apply) for Tail relative to Head
                     var offset = delta switch
                     {
                         (2, _) => (1, 0),
@@ -150,43 +150,6 @@ public class Day9
 
         // NOTE: Also from this! https://github.com/betaveros/advent-of-code-2022/blob/main/p9.noul
 
-        public List<(int, int)> ApplyStepToRope(List<(int, int)> rope, (int, int) newHeadPos, int numKnots)
-        {
-            // Console.WriteLine($"  HEAD: {rope[0]} -> {newHeadPos}");
-            // Console.WriteLine($"    ROPE:    {RopeToString(rope)}");
-
-            var newRope = new List<(int, int)>();
-
-            newRope.Add(newHeadPos);
-
-            for (int i = 1; i < numKnots; i++)
-            {
-                var newPos = newRope[i - 1];
-                var delta = Delta(newPos, rope[i]);
-
-                // More complex offset calculation for 2nd case
-
-                var offset = delta switch
-                {
-                    (2, 2) => (1, 1),
-                    (2, -2) => (1, -1),
-                    (-2, 2) => (-1, 1),
-                    (-2, -2) => (-1, -1),
-                    (2, _) => (1, 0),
-                    (-2, _) => (-1, 0),
-                    (_, 2) => (0, 1),
-                    (_, -2) => (0, -1),
-                    _ => delta
-                };
-
-                newRope.Add((newPos.Item1 + offset.Item1, newPos.Item2 + offset.Item2));
-            }
-
-            // Console.WriteLine($"    NEWROPE: {RopeToString(newRope)}");
-
-            return newRope;
-        }
-
         public long TailPositionsVisited(int numKnots)
         {
             int HEAD = 0;
@@ -199,7 +162,7 @@ public class Day9
 
             positions.Add(rope[HEAD]);
 
-            // Console.WriteLine($"Knots = {numKnots}, Head = {rope[HEAD]}, Tail = {rope[TAIL]}");
+            Console.WriteLine($"Knots = {numKnots}, Head = {rope[HEAD]}, Tail = {rope[TAIL]}");
 
             foreach ((char D, int C) inst in Instructions)
             {
@@ -209,9 +172,35 @@ public class Day9
 
                 for (var i = 0; i < inst.C; i++)
                 {
-                    var newHeadPos = Step(rope[HEAD], inst.D);
+                    // Update head and then the remaining knots
+                    rope[HEAD] = Step(rope[HEAD], inst.D);
 
-                    rope = ApplyStepToRope(rope, newHeadPos, numKnots);
+                    for (int k = 1; k < numKnots; k++)
+                    {
+                        var currHeadPos = rope[k - 1];
+
+                        var delta = Delta(currHeadPos, rope[k]);
+
+                        // More complex offset calculation for 2nd case to include diagonals
+                        var offset = delta switch
+                        {
+                            // Extra cases for three or more knots
+                            (2, 2) => (1, 1),
+                            (2, -2) => (1, -1),
+                            (-2, 2) => (-1, 1),
+                            (-2, -2) => (-1, -1),
+
+                            // Two knots cases
+                            (2, _) => (1, 0),
+                            (-2, _) => (-1, 0),
+                            (_, 2) => (0, 1),
+                            (_, -2) => (0, -1),
+
+                            _ => delta
+                        };
+
+                        rope[k] = (currHeadPos.Item1 + offset.Item1, currHeadPos.Item2 + offset.Item2);
+                    }
 
                     positions.Add(rope[TAIL]);
                 }
@@ -242,7 +231,7 @@ public class Day9
 
     private long Part1(Model model)
     {
-        return model.TailPositionsVisited();
+        return model.TailPositionsVisited(2);
     }
 
     private long Part2(Model model)
