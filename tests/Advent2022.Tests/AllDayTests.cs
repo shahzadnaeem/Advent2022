@@ -112,4 +112,16 @@ public class AllDayTests
 
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void Day10Test()
+    {
+        var day = new Day10();
+
+        // signal strengh, (display output)
+        var expected = (13180, 0);
+        var result = day.Answer();
+
+        Assert.Equal(expected, result);
+    }
 }

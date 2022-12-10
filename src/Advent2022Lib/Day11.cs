@@ -1,6 +1,6 @@
 namespace Advent2022;
 
-public class DayN
+public class Day11
 {
     enum DataType
     {
@@ -49,7 +49,7 @@ public class DayN
         }
     }
 
-    public DayN()
+    public Day11()
     {
     }
 
