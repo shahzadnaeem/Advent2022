@@ -1,6 +1,6 @@
 namespace Advent2022;
 
-public class DayN
+public class Day12
 {
     enum DataType
     {
@@ -46,14 +46,14 @@ public class DayN
         }
     }
 
-    public DayN() { }
+    public Day12() { }
 
     private Model GetModel(DataType which = DataType.INPUT, int control1 = 0, bool debug = false)
     {
         // control1 - optional control parameter (sometimes parts 1 and 2 have different behaviour)
         // debug - optional debug parameter
 
-        return new Model(which == DataType.INPUT ? DayNData.INPUT : DayNData.SAMPLE);
+        return new Model(which == DataType.INPUT ? Day12Data.INPUT : Day12Data.SAMPLE);
     }
 
     public Result Answer()
@@ -64,6 +64,7 @@ public class DayN
         var model = GetModel(which);
 
         var day = Utils.NumSpace(this.GetType().Name);
+
         Console.WriteLine($"{day} - #LINES = {model.Lines.Length}");
 
         var result1 = new Result(model.Part1(), model.Lines.Length);

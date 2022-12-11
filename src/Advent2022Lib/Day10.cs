@@ -101,7 +101,7 @@ public class Day10
             {
                 sw.Write($"{Display[r.x, r.y]}");
 
-                if (r.x == (DisplayWidth - 1))
+                if (r.x == (DisplayWidth - 1) && (r.y < (DisplayHeight - 1)))
                 {
                     sw.WriteLine();
                 }
@@ -195,17 +195,11 @@ public class Day10
 
         Console.WriteLine($"Day 10 - #INSTRUCTIONS = {model.Instructions.Length}");
 
-        Console.WriteLine(model);
-
         // Part 1
         var result1 = (Part1(model), 0);
-
         Console.WriteLine($"Part 1 = {result1}");
 
         // Part 2
-        // var result2 = (Part2(model), 0);
-
-        // Console.WriteLine($"Part 2 = {result2}");
         Console.WriteLine($"Part 2\n{model.DisplayToString()}");
 
         // Final result in a tuple

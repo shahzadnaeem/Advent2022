@@ -124,4 +124,16 @@ public class AllDayTests
 
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void Day11Test()
+    {
+        var day = new Day11();
+
+        // monkey business (20 rounds), monkey business (10000 rounds)
+        var expected = (119715, 18085004878);
+        var result = day.Answer();
+
+        Assert.Equal(expected, result);
+    }
 }

@@ -1,4 +1,8 @@
+using System.Text.RegularExpressions;
+
 namespace Advent2022;
+
+public record Result(long P1, long P2);
 
 public class Utils
 {
@@ -28,6 +32,13 @@ public class Utils
         wr.Write(" ]");
 
         return wr.ToString();
+    }
+
+    public static string NumSpace(string s)
+    {
+        var r = new Regex(@"(\D+)(\d+)");
+
+        return r.Replace(s, @"$1 $2");
     }
 
     public static void Title(string title)
