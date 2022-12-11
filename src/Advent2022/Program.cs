@@ -1,5 +1,12 @@
 ﻿using Advent2022;
 
+// Usage:
+//   Advent
+//     make run => dotnet run --project src/Advent2022
+//   Utils
+//     make RUN_ARGS=parse run => dotnet run --project src/Advent2022 parse
+
+
 if (args.Length > 0)
 {
     if (args[0] == "prep")
@@ -73,7 +80,6 @@ void RunInputPrep(string[] args)
     Utils.Title("Input Prep = Day {day}");
 
     const string DAY6DATA_PATH = @"src/Advent2022Lib/Day6Data.txt";
-    const string TESTDATA_PATH = @"src/Advent2022Lib/TestData.txt";
 
     var path = DAY6DATA_PATH;
     var chunkSize = 100;
