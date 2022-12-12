@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Advent2022;
 
 public class Day12
@@ -8,12 +10,15 @@ public class Day12
         SAMPLE
     }
 
-    // TODO: Other enums/consts/classes ...
+    const int PART1 = 1;
+    const int PART2 = 2;
+
     const int NOPE = -1;
     const char START = 'S';
     const int START_HEIGHT = 1;
     const char TARGET = 'E';
     const int TARGET_HEIGHT = 26;
+    const char EMPTY = '.';
 
     public class Model
     {
@@ -21,7 +26,7 @@ public class Day12
         public int Width { get; init; } = NOPE;
         public int Height { get; init; } = NOPE;
         // (height,visited)
-        public (int, bool)[,] Map { get; init; } = null!;
+        public (int, char)[,] Map { get; init; } = null!;
         public (int, int) Start { get; init; } = (NOPE, NOPE);
         public (int, int) Target { get; init; } = (NOPE, NOPE);
 
@@ -32,7 +37,7 @@ public class Day12
             Width = Lines[0].Length;
             Height = Lines.Length;
 
-            Map = new (int, bool)[Width, Height];
+            Map = new (int, char)[Width, Height];
 
             int y = 0;
             foreach (var line in Lines)
@@ -48,7 +53,7 @@ public class Day12
                         Target = (x, y);
                     }
 
-                    Map[x, y] = (ToHeight(c), false);
+                    Map[x, y] = (ToHeight(c), EMPTY);
                 }
 
                 y++;
@@ -69,17 +74,17 @@ public class Day12
 
         public bool IsVisted((int x, int y) p)
         {
-            return Map[p.x, p.y].Item2;
+            return Map[p.x, p.y].Item2 != EMPTY;
         }
 
-        public bool SetVisted((int x, int y) p)
+        public void SetVisted((int x, int y) p, char d)
         {
-            return Map[p.x, p.y].Item2 = true;
+            Map[p.x, p.y].Item2 = d;
         }
 
-        public bool ClearVisted((int x, int y) p)
+        public void ClearVisted((int x, int y) p)
         {
-            return Map[p.x, p.y].Item2 = false;
+            Map[p.x, p.y].Item2 = EMPTY;
         }
 
         public int HeightAtPos((int x, int y) p)
@@ -87,31 +92,40 @@ public class Day12
             return Map[p.x, p.y].Item1;
         }
 
-        public List<(int, int)> NextMoves((int x, int y) p)
+        public List<((int, int), char)> NextMoves((int x, int y) p)
         {
-            var options = new List<(int, int)>();
+            var options = new List<((int, int), char)>();
 
             var currHeight = HeightAtPos(p);
 
-            foreach (var delta in new (int x, int y)[] { (0, 1), (0, -1), (1, 0), (-1, 0) })
+            foreach (var delta in new (int x, int y, char d)[] { (0, 1, 'V'), (0, -1, '^'), (1, 0, '<'), (-1, 0, '>') })
             {
                 var opt = (p.x + delta.x, p.y + delta.y);
                 if (OnMap(opt) && !IsVisted(opt))
                 {
                     var diff = HeightAtPos(opt) - currHeight;
                     if (diff <= 1)
-                        options.Add(opt);
+                        options.Add((opt, delta.d));
                 }
             }
 
             return options;
         }
 
-        public void ResetMap()
+        public List<(int x, int y)> AllPositions()
         {
+            var positions = new List<(int x, int y)>();
+
             foreach (var x in Enumerable.Range(0, Width))
                 foreach (var y in Enumerable.Range(0, Height))
-                    Map[x, y] = (Map[x, y].Item1, false);
+                    positions.Add((x, y));
+
+            return positions;
+        }
+
+        public void Reset()
+        {
+            AllPositions().ForEach(pos => ClearVisted(pos));
         }
 
         public string MapToString()
@@ -130,6 +144,7 @@ public class Day12
                     {
                         if (IsVisted(p))
                         {
+                            // sw.Write(Map[p.x, p.y].Item2);
                             sw.Write('.');
                         }
                         else
@@ -147,102 +162,64 @@ public class Day12
             return sw.ToString();
         }
 
-        // TODO: Parts 1 and 2
-        public long Part1(bool debug = false)
+        public long Solve(int part = PART1, bool debug = false)
         {
-            // pos = Start
-            // steps = 0
+            Reset();
 
-            // doSolve( pos, (steps, minSteps) ) => int (newSteps, minSteps) or NOPE
+            var queue = new Queue<(((int x, int y), char), int st)>();
 
-            int minSteps = Width * Height + 1;
-            int solutions = 0;
-
-            int numSet = 0;
-            long ticks = 0;
-
-            var path = new Stack<(int x, int y)>();
-
-            (int, int) doSolve((int x, int y) pos, int steps)
+            if (part == PART1)
             {
-                SetVisted(pos);
-
-                var nextMoves = NextMoves(pos);
-
-                foreach (var next in nextMoves)
+                queue.Enqueue(((Start, START), 0));
+            }
+            else
+            {
+                AllPositions().ForEach(pos =>
                 {
-                    if (next == Target)
-                    {
-                        solutions++;
-                        steps++;
-
-                        if (steps < minSteps)
-                        {
-                            minSteps = steps;
-                        }
-
-                        Console.WriteLine($"#{solutions}, steps={steps}, minsteps={minSteps}");
-
-                        Console.WriteLine(MapToString());
-                    }
-                    else
-                    {
-                        doSolve(next, steps + 1);
-                    }
-                }
-                ClearVisted(pos);
-
-                return (solutions == 0 ? 0 : minSteps, solutions);
+                    if (HeightAtPos(pos) == 1)
+                        queue.Enqueue(((pos, EMPTY), 0));
+                });
             }
 
+            int doSolve()
+            {
+                int result = -1;
 
-            // ticks++;
-            // if (pos == Target)
-            // {
-            //     solutions++;
+                while (queue.Count > 0)
+                {
+                    var ((pos, d), st) = queue.Dequeue();
 
-            //     if (steps < minSteps)
-            //     {
-            //         minSteps = steps;
-            //     }
+                    if (!IsVisted(pos))
+                    {
+                        SetVisted(pos, d);
+                        if (pos == Target)
+                        {
+                            result = st;
+                            break;
+                        }
+                        else
+                        {
+                            var nextMoves = NextMoves(pos);
+                            foreach (var next in NextMoves(pos))
+                                queue.Enqueue((next, st + 1));
+                        }
+                    }
+                }
 
-            //     Console.WriteLine($"... positions set={numSet}, ticks={ticks}");
-            //     Console.WriteLine($"#{solutions}, steps={steps}, minsteps={minSteps}");
+                return result;
+            }
 
-            //     Console.WriteLine(MapToString());
-            // }
-            // else
-            // {
+            var result = doSolve();
 
-            //     if (numSet % 10 == 0 || ticks % 10000 == 0)
-            //     {
-            //         Console.WriteLine($"... positions set={numSet}, ticks={ticks}");
-            //     }
+            if (debug)
+            {
+                Console.WriteLine($"Part1: {result}");
+                Console.WriteLine(MapToString());
+            }
 
-            //     var nextMoves = NextMoves(pos);
-
-            //     foreach (var next in nextMoves)
-            //     {
-            //         numSet++;
-            //         SetVisted(pos);
-            //         doSolve(next, steps + 1);
-            //         ClearVisted(pos);
-            //         numSet--;
-            //     }
-            // }
-
-            var result = doSolve(Start, 0);
-
-            Console.WriteLine($"Part1: {result}");
-
-            return result.Item1;
+            return result;
         }
 
-        public long Part2(bool debug = false)
-        {
-            // TODO: Stuff...
-            return -1;
-        }
 
         public override string ToString()
         {
@@ -259,11 +236,8 @@ public class Day12
 
     public Day12() { }
 
-    private Model GetModel(DataType which = DataType.INPUT, int control1 = 0, bool debug = false)
+    private Model GetModel(DataType which = DataType.INPUT)
     {
-        // control1 - optional control parameter (sometimes parts 1 and 2 have different behaviour)
-        // debug - optional debug parameter
-
         return new Model(which == DataType.INPUT ? Day12Data.INPUT : Day12Data.SAMPLE);
     }
 
@@ -275,14 +249,12 @@ public class Day12
 
         var day = Utils.NumSpace(this.GetType().Name);
         Console.WriteLine($"{day} - #LINES = {model.Lines.Length}");
-        Console.WriteLine($"{model}");
+        // Console.WriteLine($"{model}");
 
-        var result1 = new Result(model.Part1(), model.Lines.Length);
+        var result1 = new Result(model.Solve(PART1), model.Lines.Length);
         Console.WriteLine($"Part 1 = {result1}");
 
-        // TODO: Possible altenative model - or keep using above version
-        model = GetModel(which, 123);
-        var result2 = new Result(model.Part2(), model.Lines.Length);
+        var result2 = new Result(model.Solve(PART2), model.Lines.Length);
         Console.WriteLine($"Part 2 = {result2}");
 
         return new Result(result1.P1, result2.P1);
