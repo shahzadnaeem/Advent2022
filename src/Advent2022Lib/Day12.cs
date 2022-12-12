@@ -92,9 +92,9 @@ public class Day12
             return Map[p.x, p.y].Item1;
         }
 
-        public List<((int, int), char)> NextMoves((int x, int y) p)
+        public List<((int, int), (int, int), char)> NextMoves((int x, int y) p)
         {
-            var options = new List<((int, int), char)>();
+            var options = new List<((int, int), (int, int), char)>();
 
             var currHeight = HeightAtPos(p);
 
@@ -105,7 +105,7 @@ public class Day12
                 {
                     var diff = HeightAtPos(opt) - currHeight;
                     if (diff <= 1)
-                        options.Add((opt, delta.d));
+                        options.Add((p, opt, delta.d));
                 }
             }
 
@@ -136,39 +136,54 @@ public class Day12
 
             foreach (var y in Enumerable.Range(0, Height))
             {
-                if (startInCol1)
-                {
-                    if (y == Start.Item2)
-                        sw.Write('S');
-                    else
-                        sw.Write(' ');
-                }
+                // if (startInCol1)
+                // {
+                //     if (y == Start.Item2)
+                //         sw.Write('S');
+                //     else
+                //         sw.Write(' ');
+                // }
 
                 foreach (var x in Enumerable.Range(0, Width))
                 {
                     var p = (x, y);
 
-                    if (p == Start && !final) sw.Write(START);
-                    else if (p == Target) sw.Write(TARGET);
+                    if (p == Target)
+                    {
+                        sw.Write(' ');
+                        sw.Write(TARGET);
+                    }
+                    else if (p == Start)
+                    {
+                        sw.Write(START);
+                        sw.Write(Map[p.x, p.y].Item2);
+                    }
                     else
                     {
+                        if (!final || true)
+                            sw.Write((char)('a' + Map[x, y].Item1 - 1));
+                        else
+                            sw.Write('.');
+
                         if (IsVisted(p))
                         {
                             sw.Write(Map[p.x, p.y].Item2);
-                            // sw.Write('.');
                         }
                         else
                         {
-                            if (!final)
-                                sw.Write((char)('a' + Map[x, y].Item1 - 1));
-                            else
-                                sw.Write('.');
+                            sw.Write('.');
                         }
-
                     }
+                    sw.Write('|');
                 }
 
-                if (y != Height - 1) sw.WriteLine();
+                if (y != Height - 1)
+                {
+                    sw.WriteLine();
+                    foreach (var x in Enumerable.Range(0, Width))
+                        sw.Write("---");
+                    sw.WriteLine();
+                }
             }
 
 
@@ -190,10 +205,10 @@ public class Day12
 
             var path = new Stack<(int x, int y)>();
 
-            (int, int) doSolve(((int x, int y), char) pos, int steps)
+            (int, int) doSolve((int x, int y) pos, int steps)
             {
                 ticks++;
-                if (pos.Item1 == Target)
+                if (pos == Target)
                 {
                     solutions++;
 
@@ -203,7 +218,7 @@ public class Day12
                     }
 
                     // Console.WriteLine($"... positions set={numSet}, ticks={ticks}");
-                    Console.WriteLine($"#{solutions}, steps={steps}, minsteps={minSteps}");
+                    Console.WriteLine($"\n#{solutions}, steps={steps}, minsteps={minSteps}\n");
 
                     Console.WriteLine(MapToString(true));
                 }
@@ -215,23 +230,23 @@ public class Day12
                         // Console.WriteLine($"... positions set={numSet}, ticks={ticks}");
                     }
 
-                    var nextMoves = NextMoves(pos.Item1);
+                    var nextMoves = NextMoves(pos);
 
                     foreach (var next in nextMoves)
                     {
                         numSet++;
-                        SetVisted(pos.Item1, next.Item2);
-                        doSolve(next, steps + 1);
-                        ClearVisted(pos.Item1);
+                        SetVisted(next.Item1, next.Item3);
+                        doSolve(next.Item2, steps + 1);
+                        ClearVisted(next.Item1);
                         numSet--;
                     }
                 }
 
                 return (solutions == 0 ? 0 : minSteps, solutions);
             }
-            var result = doSolve((Start, START), 0);
+            var result = doSolve(Start, 0);
 
-            Console.WriteLine($"Part1: {result}");
+            Console.WriteLine($"Part {part}: {result}");
 
             return result.Item1;
         }
@@ -242,18 +257,18 @@ public class Day12
 
             Reset();
 
-            var queue = new Queue<(((int x, int y), char), int st)>();
+            var queue = new Queue<(((int x, int y), (int x, int y), char), int st)>();
 
             if (part == PART1)
             {
-                queue.Enqueue(((Start, START), 0));
+                queue.Enqueue(((Start, Start, START), 0));
             }
             else
             {
                 AllPositions().ForEach(pos =>
                 {
                     if (HeightAtPos(pos) == 1)
-                        queue.Enqueue(((pos, EMPTY), 0));
+                        queue.Enqueue(((pos, pos, EMPTY), 0));
                 });
             }
 
@@ -263,12 +278,12 @@ public class Day12
 
                 while (queue.Count > 0)
                 {
-                    var ((pos, d), st) = queue.Dequeue();
+                    var ((prev, pos, d), st) = queue.Dequeue();
 
                     if (!IsVisted(pos))
                     {
-                        // TODO: The direction is not correct here :( - off by one kind of thing
-                        SetVisted(pos, d);
+                        // TODO: Set where we came from to the direction - IS THIS CORRECT???
+                        SetVisted(prev, d);
 
                         if (pos == Target)
                         {
@@ -277,6 +292,9 @@ public class Day12
                         }
                         else
                         {
+                            // TODO: A current marker
+                            SetVisted(pos, '#');
+
                             var nextMoves = NextMoves(pos);
                             foreach (var next in NextMoves(pos))
                                 queue.Enqueue((next, st + 1));
@@ -291,7 +309,7 @@ public class Day12
 
             if (debug)
             {
-                Console.WriteLine($"Part1: {result}");
+                Console.WriteLine($"\nPart {part}: {result}");
                 Console.WriteLine(MapToString(true));
             }
 
@@ -321,7 +339,7 @@ public class Day12
 
     public Result Answer()
     {
-        DataType which = DataType.SAMPLE;
+        DataType which = DataType.INPUT;
 
         var model = GetModel(which);
 
@@ -329,10 +347,13 @@ public class Day12
         Console.WriteLine($"{day} - #LINES = {model.Lines.Length}");
         // Console.WriteLine($"{model}");
 
-        var result1 = new Result(model.Solve(PART1, true), model.Lines.Length);
+        // var result = new Result(model.SolveByPath(PART1, true), model.Lines.Length);
+        // Console.WriteLine($"Part 1 = {result}");
+
+        var result1 = new Result(model.Solve(PART1, false), model.Lines.Length);
         Console.WriteLine($"Part 1 = {result1}");
 
-        var result2 = new Result(model.Solve(PART2, true), model.Lines.Length);
+        var result2 = new Result(model.Solve(PART2, false), model.Lines.Length);
         Console.WriteLine($"Part 2 = {result2}");
 
         return new Result(result1.P1, result2.P1);

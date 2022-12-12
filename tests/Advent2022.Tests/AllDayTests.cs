@@ -136,4 +136,16 @@ public class AllDayTests
 
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void Day12Test()
+    {
+        var day = new Day12();
+
+        // shortest from Start, shortest overall
+        var expected = new Advent2022.Result(408, 399);
+        var result = day.Answer();
+
+        Assert.Equal(expected, result);
+    }
 }
