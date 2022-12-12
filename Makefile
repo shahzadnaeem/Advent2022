@@ -11,7 +11,7 @@ TEST_REPORT=$(TEST_PROJECT)/TestReport
 DOTNET=dotnet
 COVERAGE_REPORTER=$(TEST_PROJECT)/scripts/createCoverageReport.sh
 
-.PHONY: build clean distclean generated watch run test coverage coverage-report coverage-report-html
+.PHONY: build clean distclean generated watch run test test-adhoc coverage coverage-report coverage-report-html
 
 build:
 	$(DOTNET) $@
@@ -34,6 +34,11 @@ watch run:
 
 test:
 	$(DOTNET) test $(TEST_OPTIONS) $(TEST_PROJECT) $(TEST_ARGS)
+
+TEST_ADHOC_OPTIONS=--filter FullyQualifiedName~AdHoc
+
+test-adhoc:
+	$(DOTNET) test $(TEST_ADHOC_OPTIONS) $(TEST_PROJECT) $(TEST_ARGS)
 
 # Coverage test run
 coverage:

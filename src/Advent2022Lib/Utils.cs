@@ -26,7 +26,7 @@ public class Utils
         {
             wr.Write($"{item}");
             c--;
-            if (c > 0) wr.WriteLine(',');
+            if (c > 0) wr.Write(',');
         }
 
         wr.Write(" ]");
