@@ -6,18 +6,18 @@ public class XEnumerable
 {
     public static IEnumerable<T[]> Window<T>(IEnumerable<T> xs, int width)
     {
+        if (width <= 0)
+        {
+            throw new ArgumentOutOfRangeException("Chunk width must be more than zero");
+        }
+
         // NOTE: NOT cloned - just copied
 
         var result = new List<T[]>();
 
         var numWins = xs.Count() - width + 1;
 
-        if (numWins <= 0)
-        {
-            throw new ArgumentException("Not enough data to create windows");
-        }
-
-        if (numWins == 1)
+        if (numWins <= 1)
         {
             result.Add(xs.ToArray());
             return result;
@@ -51,20 +51,6 @@ public class XEnumerable
                 numTargets = Math.Min(width, numTargets++);
             }
         }
-
-        // Assert xs.Length >= width
-        // num = xs.Legth - width + 1
-
-        // Create all `num` windows of `width`
-        // Loop over all items in `xs` as `x`
-
-        // Add `x` to each window
-        // When a window is full
-        //   add it to the output list to the output
-        //   clear this window
-        // Keep going until all numbers have been processed
-
-        // At end some windows will have partial contens - throw them away
 
         return result;
 

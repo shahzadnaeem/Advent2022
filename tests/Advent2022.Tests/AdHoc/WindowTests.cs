@@ -12,11 +12,23 @@ namespace Advent2022Lib.Tests.AdHoc;
 
 public class WindowTests
 {
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void InvalidChunkWidthThrows(int width)
+    {
+        var input = Enumerable.Range(0, 0);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => { var res = XEnumerable.Window(input, width); });
+    }
+
     [Fact]
-    public void InsuffientDataThrowsExceptionTest()
+    public void InsuffientDataReturnsOneWindow()
     {
         var input = new List<int> { 1, 2, 3, 4 };
-        Assert.Throws<ArgumentException>(() => { var res = XEnumerable.Window(input, 6); });
+        var res = XEnumerable.Window(input, 6);
+
+        Assert.Equal(input, res.Single());
     }
 
     [Fact]
