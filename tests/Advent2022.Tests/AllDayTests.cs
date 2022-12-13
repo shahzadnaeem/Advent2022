@@ -148,4 +148,16 @@ public class AllDayTests
 
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void Day13Test()
+    {
+        var day = new Day13();
+
+        // correct order sum, decoder key
+        var expected = new Advent2022.Result(5330, 27648);
+        var result = day.Answer();
+
+        Assert.Equal(expected, result);
+    }
 }

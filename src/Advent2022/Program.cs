@@ -61,7 +61,7 @@ void RunAdvent(string[] args)
     Utils.Result($"Answer = {new Day8().Answer().ToString()}");
 
     Utils.Day(9);
-    Utils.Result($"Answer = {new Day9().Answer().ToString()}");
+    Utils.Result($"Answer (HELPED!) = {new Day9().Answer().ToString()}");
 
     Utils.Day(10);
     Utils.Result($"Answer = {new Day10().Answer().ToString()}");
@@ -71,6 +71,9 @@ void RunAdvent(string[] args)
 
     Utils.Day(12);
     Utils.Result($"Answer = {new Day12().Answer().ToString()}");
+
+    Utils.Day(13);
+    Utils.Result($"Answer (NOT MINE!) = {new Day13().Answer().ToString()}");
 }
 
 void RunInputPrep(string[] args)
