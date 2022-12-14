@@ -42,12 +42,14 @@ public class WindowTests
 
     [Theory]
     [InlineData(6, 3)]
-    [InlineData(12, 6)]
-    [InlineData(1200, 200)]
-    public void TwoWindowTest(int size, int width)
+    [InlineData(12, 7)]
+    [InlineData(1200, 127)]
+    public void MultipleWindowTest(int size, int width)
     {
-        var input = Enumerable.Range(1, size).ToList();
-        int NUM_WINDOWS = size / width;
+        var rng = new System.Random();
+
+        var input = Enumerable.Range(1, size).Select(i => rng.Next()).ToList();
+        int NUM_WINDOWS = size - width + 1;
 
         var res = XEnumerable.Window(input, width).ToArray();
 
@@ -55,7 +57,7 @@ public class WindowTests
 
         for (var win = 0; win < NUM_WINDOWS; win++)
         {
-            Assert.Equal(Enumerable.Range(win + 1, width).ToArray(), res[win]);
+            Assert.Equal(Enumerable.Range(win, width).Select(i => input[i]).ToArray(), res[win]);
         }
     }
 }

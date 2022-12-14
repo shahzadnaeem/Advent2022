@@ -195,7 +195,7 @@ public class Day12
             Reset();
 
             // NOTE: Creates the correct path(s) for small problem spaces
-            //       Failed to give a solution for the puzzle input
+            //       What was I thinking, anything reasonably large will take forever!
 
             int minSteps = Width * Height + 1;
             int solutions = 0;
