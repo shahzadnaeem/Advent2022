@@ -112,9 +112,11 @@ public class Day14
             return p.X < 0 || p.X >= Width || p.Y >= Height;
         }
 
-        public bool CanDrop(Position p, int dx = 0, int dy = 1)
+        public bool DoDrop(int grain, Position p, bool diag = false, int dx = 0, int dy = 1)
         {
             bool canDrop = false;
+
+            Console.WriteLine($"#{grain}: p = ({p.X},{p.Y}), dir2here = {(diag ? "diag" : "down")}, dx = {dx}, dy = {dy}");
 
             if (Board[p.X, p.Y] != BoardContents.EMPTY)
             {
@@ -130,14 +132,27 @@ public class Day14
 
             if (Board[newP.X, newP.Y] == BoardContents.EMPTY)
             {
-                return CanDrop(newP);
+                return DoDrop(grain, newP);
             }
             else
             {
-                if (!CanDrop(new Position(p.X - 1, p.Y + 1)) && !CanDrop(new Position(p.X + 1, p.Y + 1)))
+                if (diag)
                 {
+                    // We got here diagonally - so place sand here!
                     Board[p.X, p.Y] = BoardContents.SAND;
                     canDrop = true;
+                }
+                else
+                {
+                    if (!DoDrop(grain, new Position(p.X - 1, p.Y + 1), true) && !DoDrop(grain, new Position(p.X + 1, p.Y + 1), true))
+                    {
+                        Board[p.X, p.Y] = BoardContents.SAND;
+                        canDrop = true;
+                    }
+                    else
+                    {
+                        canDrop = true;
+                    }
                 }
             }
 
@@ -145,11 +160,11 @@ public class Day14
         }
 
 
-        public bool TryDrop()
+        public bool Drop(int grain)
         {
             var start = new Position(SOURCE_X - FirstX, 0);
 
-            return CanDrop(start);
+            return DoDrop(grain, start);
         }
 
         // TODO: Parts 1 and 2
@@ -159,7 +174,7 @@ public class Day14
 
             try
             {
-                while (TryDrop())
+                while (Drop(grain))
                 {
                     grain++;
                     Console.WriteLine($"\nGrain: {grain}\n{BoardToString()}");
