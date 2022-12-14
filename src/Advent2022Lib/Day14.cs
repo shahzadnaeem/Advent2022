@@ -134,51 +134,50 @@ public class Day14
             return p.X < 0 || p.X >= Width || p.Y >= Height;
         }
 
-        public bool DoDrop(int grain, Position p, int dx = 0, int dy = 1)
+        private Position nextPosition(Position p, int dx, int dy)
         {
-            bool canDrop = false;
+            var next = new Position(p.X + dx, p.Y + dy);
 
-            var diag = dx != 0;
+            if (TheAbyss(next))
+            {
+                throw new Exception($"Abyss!: p = ({p.X},{p.Y}), newP = ({next.X},{next.Y})");
+            }
 
-            // Console.WriteLine($"#{grain}: p = ({p.X},{p.Y}), dir2here = {(diag ? "diag" : "down")}, dx = {dx}, dy = {dy}");
+            return next;
+        }
 
+        public bool DoDrop(Position p, int dx = 0, int dy = 1)
+        {
             if (Board[p.X, p.Y] == BoardContents.EMPTY)
             {
-                var newP = new Position(p.X + dx, p.Y + dy);
+                var nextP = nextPosition(p, dx, dy);
 
-                if (TheAbyss(newP))
+                if (Board[nextP.X, nextP.Y] == BoardContents.EMPTY)
                 {
-                    throw new Exception($"Abyss!: p = ({p.X},{p.Y}), newP = ({newP.X},{newP.Y})");
-                }
-
-                if (Board[newP.X, newP.Y] == BoardContents.EMPTY)
-                {
-                    return DoDrop(grain, newP);
+                    return DoDrop(nextP);
                 }
                 else
                 {
-                    if (!diag)
+                    if (dx == 0)
                     {
-                        // If we just dropped down to here, we check the diagonals
-                        canDrop = true;
-
-                        if (!DoDrop(grain, p, -1, 1) && !DoDrop(grain, p, 1, 1))
+                        // If we just dropped down to here, we try the diagonals first
+                        if (!DoDrop(p, -1, 1) && !DoDrop(p, 1, 1))
                         {
+                            // Diagnonals did not succeed so here is fine
                             Board[p.X, p.Y] = BoardContents.SAND;
                         }
+
+                        return true;
                     }
                 }
             }
 
-            return canDrop;
+            return false;
         }
 
-
-        public bool Drop(int grain)
+        public bool Drop(Position p)
         {
-            var start = new Position(XOffset + SourceX - FirstX, 0);
-
-            return DoDrop(grain, start);
+            return DoDrop(p);
         }
 
         public long Solve(bool debug = false)
@@ -187,10 +186,12 @@ public class Day14
 
             try
             {
-                while (Drop(grain))
+                var p = new Position(XOffset + SourceX - FirstX, 0);
+
+                while (Drop(p))
                 {
                     grain++;
-                };
+                }
             }
             catch (Exception)
             {
