@@ -192,16 +192,12 @@ public class Day14
                 while (Drop(grain))
                 {
                     grain++;
-                    // Console.WriteLine($"\nGrain: {grain}\n{BoardToString()}");
                 };
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // We hit the abyss!
-                // Console.WriteLine($"\nGrain = {grain}: {e.Message}\n");
             }
-
-            // Console.WriteLine($"\nGrain: {grain}\n{BoardToString()}");
 
             return grain;
         }
