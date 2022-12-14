@@ -68,7 +68,7 @@ public class Day14
             Reset();
         }
 
-        private void Reset()
+        private void Reset(int part = 1)
         {
             for (var x = 0; x < Width; x++)
                 for (var y = 0; y < Height; y++)
@@ -112,48 +112,46 @@ public class Day14
             return p.X < 0 || p.X >= Width || p.Y >= Height;
         }
 
-        public bool DoDrop(int grain, Position p, bool diag = false, int dx = 0, int dy = 1)
+        public bool DoDrop(int grain, Position p, int dx = 0, int dy = 1)
         {
             bool canDrop = false;
 
-            Console.WriteLine($"#{grain}: p = ({p.X},{p.Y}), dir2here = {(diag ? "diag" : "down")}, dx = {dx}, dy = {dy}");
+            var diag = dx != 0;
 
-            if (Board[p.X, p.Y] != BoardContents.EMPTY)
-            {
-                return false;
-            }
+            // Console.WriteLine($"#{grain}: p = ({p.X},{p.Y}), dir2here = {(diag ? "diag" : "down")}, dx = {dx}, dy = {dy}");
 
             var newP = new Position(p.X + dx, p.Y + dy);
 
-            if (TheAbyss(newP))
+            if (Board[p.X, p.Y] == BoardContents.EMPTY)
             {
-                throw new Exception($"Abyss!: p = ({p.X},{p.Y}), newP = ({newP.X},{newP.Y})");
-            }
-
-            if (Board[newP.X, newP.Y] == BoardContents.EMPTY)
-            {
-                return DoDrop(grain, newP);
-            }
-            else
-            {
-                if (diag)
+                if (TheAbyss(newP))
                 {
-                    // We got here diagonally - so place sand here!
-                    Board[p.X, p.Y] = BoardContents.SAND;
-                    canDrop = true;
+                    throw new Exception($"Abyss!: p = ({p.X},{p.Y}), newP = ({newP.X},{newP.Y})");
+                }
+
+                if (Board[newP.X, newP.Y] == BoardContents.EMPTY)
+                {
+                    return DoDrop(grain, newP);
                 }
                 else
                 {
-                    if (!DoDrop(grain, new Position(p.X - 1, p.Y + 1), true) && !DoDrop(grain, new Position(p.X + 1, p.Y + 1), true))
-                    {
-                        Board[p.X, p.Y] = BoardContents.SAND;
-                        canDrop = true;
-                    }
-                    else
+                    if (!diag)
                     {
                         canDrop = true;
+
+                        if (!DoDrop(grain, p, -1, 1) && !DoDrop(grain, p, 1, 1))
+                        {
+                            Board[p.X, p.Y] = BoardContents.SAND;
+                            canDrop = true;
+
+                            // Console.WriteLine($"  -> ({p.X},{p.Y}) down");
+                        }
                     }
                 }
+            }
+            else
+            {
+                // Console.WriteLine($"  -> NOPE");
             }
 
             return canDrop;
@@ -177,14 +175,16 @@ public class Day14
                 while (Drop(grain))
                 {
                     grain++;
-                    Console.WriteLine($"\nGrain: {grain}\n{BoardToString()}");
+                    // Console.WriteLine($"\nGrain: {grain}\n{BoardToString()}");
                 };
             }
             catch (Exception e)
             {
-                Console.WriteLine($"\nGrain = {grain}: {e.Message}\n");
                 // We hit the abyss!
+                Console.WriteLine($"\nGrain = {grain}: {e.Message}\n");
             }
+
+            Console.WriteLine($"\nGrain: {grain}\n{BoardToString()}");
 
             return grain;
         }
@@ -256,8 +256,7 @@ public class Day14
 
     public Result Answer()
     {
-        // TODO: Start with SAMPLE data
-        DataType which = DataType.SAMPLE;
+        DataType which = DataType.INPUT;
 
         var model = GetModel(which);
 
