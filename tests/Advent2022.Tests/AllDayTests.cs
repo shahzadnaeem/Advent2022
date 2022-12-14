@@ -1,7 +1,7 @@
 using Advent2022;
 using Xunit;
 
-namespace Advent2022Lib.Tests;
+namespace Advent2022Lib.Tests.Days;
 
 public class AllDayTests
 {
@@ -156,6 +156,18 @@ public class AllDayTests
 
         // correct order sum, decoder key
         var expected = new Advent2022.Result(5330, 27648);
+        var result = day.Answer();
+
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void Day14Test()
+    {
+        var day = new Day14();
+
+        // grains, grains with floor
+        var expected = new Advent2022.Result(897, 26683);
         var result = day.Answer();
 
         Assert.Equal(expected, result);

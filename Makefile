@@ -4,7 +4,7 @@ TESTS=tests
 PROJECT=$(SRC)/Advent2022
 LIB_PROJECT=$(SRC)/Advent2022Lib
 TEST_PROJECT=$(TESTS)/Advent2022.Tests
-TEST_OPTIONS=--filter FullyQualifiedName!=Advent2022Lib.Tests.DayNTests.ATest
+TEST_OPTIONS=--filter FullyQualifiedName~Days
 TEST_RESULTS=$(TEST_PROJECT)/TestResults
 TEST_REPORT=$(TEST_PROJECT)/TestReport
 
