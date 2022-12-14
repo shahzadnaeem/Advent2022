@@ -10,13 +10,15 @@ public class Day14
         SAMPLE
     }
 
-    // TODO: Other enums/consts/classes ...
     public enum BoardContents
     {
         EMPTY,
         WALL,
         SAND
     }
+
+    const int PART_1 = 1;
+    const int PART_2 = 2;
 
     public record Position(int X, int Y);
 
@@ -28,11 +30,13 @@ public class Day14
         public int Height { get; init; } = 0;
         public int Width { get; init; } = 0;
         public int FirstX { get; init; } = 0;
+        public int XOffset { get; set; } = 0;
         public bool SourceValid { get; init; } = false;
+        public int SourceX { get; set; } = 0;
         public List<List<(Position, Position)>> Paths { get; init; } = null!;
         public BoardContents[,] Board { get; init; } = null!;
 
-        public Model(string input)
+        public Model(string input, int part = PART_1)
         {
             Lines = input.Split(Environment.NewLine);
 
@@ -59,13 +63,23 @@ public class Day14
             Height = Paths.Max(path => path.Max(pair => Math.Max(pair.Item1.Y, pair.Item2.Y))) + 1;
             FirstX = Paths.Min(path => path.Min(pair => Math.Min(pair.Item1.X, pair.Item2.X)));
             var lastX = Paths.Max(path => path.Max(pair => Math.Max(pair.Item1.X, pair.Item2.X)));
+
             Width = lastX - FirstX + 1;
 
             SourceValid = SOURCE_X >= FirstX && SOURCE_X < FirstX + Width;
+            SourceX = SOURCE_X;
+
+            if (part == 2)
+            {
+                // Part 2 adjustments
+                Width += (2 * Height);
+                XOffset = Height - 1;
+                Height += 2;
+            }
 
             // Create the board...
             Board = new BoardContents[Width, Height];
-            Reset();
+            Reset(part);
         }
 
         private void Reset(int part = 1)
@@ -77,24 +91,32 @@ public class Day14
                 }
 
             AddWalls();
+
+            if (part == 2)
+            {
+                AddWall(new Position(FirstX + 0, Height - 1), new Position(FirstX + Width - 1, Height - 1), 0);
+            }
         }
 
         private void AddWalls()
         {
             Paths.ForEach(path =>
             {
-                path.ForEach(pair => AddWall(pair.Item1, pair.Item2));
+                path.ForEach(pair =>
+                {
+                    AddWall(pair.Item1, pair.Item2, XOffset);
+                });
             });
         }
 
-        private void AddWall(Position from, Position to)
+        private void AddWall(Position from, Position to, int xOffset = 0)
         {
             if (from.X == to.X)
             {
                 // Vertical
                 for (int y = Math.Min(from.Y, to.Y); y <= Math.Max(from.Y, to.Y); y++)
                 {
-                    Board[from.X - FirstX, y] = BoardContents.WALL;
+                    Board[xOffset + from.X - FirstX, y] = BoardContents.WALL;
                 }
             }
             else
@@ -102,7 +124,7 @@ public class Day14
                 // Horizontal
                 for (int x = Math.Min(from.X, to.X); x <= Math.Max(from.X, to.X); x++)
                 {
-                    Board[x - FirstX, from.Y] = BoardContents.WALL;
+                    Board[xOffset + x - FirstX, from.Y] = BoardContents.WALL;
                 }
             }
         }
@@ -120,10 +142,10 @@ public class Day14
 
             // Console.WriteLine($"#{grain}: p = ({p.X},{p.Y}), dir2here = {(diag ? "diag" : "down")}, dx = {dx}, dy = {dy}");
 
-            var newP = new Position(p.X + dx, p.Y + dy);
-
             if (Board[p.X, p.Y] == BoardContents.EMPTY)
             {
+                var newP = new Position(p.X + dx, p.Y + dy);
+
                 if (TheAbyss(newP))
                 {
                     throw new Exception($"Abyss!: p = ({p.X},{p.Y}), newP = ({newP.X},{newP.Y})");
@@ -137,21 +159,17 @@ public class Day14
                 {
                     if (!diag)
                     {
+                        // If we just dropped down to here, we check the diagonals
                         canDrop = true;
 
                         if (!DoDrop(grain, p, -1, 1) && !DoDrop(grain, p, 1, 1))
                         {
                             Board[p.X, p.Y] = BoardContents.SAND;
-                            canDrop = true;
 
                             // Console.WriteLine($"  -> ({p.X},{p.Y}) down");
                         }
                     }
                 }
-            }
-            else
-            {
-                // Console.WriteLine($"  -> NOPE");
             }
 
             return canDrop;
@@ -160,13 +178,12 @@ public class Day14
 
         public bool Drop(int grain)
         {
-            var start = new Position(SOURCE_X - FirstX, 0);
+            var start = new Position(XOffset + SourceX - FirstX, 0);
 
             return DoDrop(grain, start);
         }
 
-        // TODO: Parts 1 and 2
-        public long Part1(bool debug = false)
+        public long Solve(bool debug = false)
         {
             int grain = 0;
 
@@ -181,18 +198,12 @@ public class Day14
             catch (Exception e)
             {
                 // We hit the abyss!
-                Console.WriteLine($"\nGrain = {grain}: {e.Message}\n");
+                // Console.WriteLine($"\nGrain = {grain}: {e.Message}\n");
             }
 
-            Console.WriteLine($"\nGrain: {grain}\n{BoardToString()}");
+            // Console.WriteLine($"\nGrain: {grain}\n{BoardToString()}");
 
             return grain;
-        }
-
-        public long Part2(bool debug = false)
-        {
-            // TODO: Stuff...
-            return -1;
         }
 
         public string BoardToString()
@@ -214,7 +225,7 @@ public class Day14
                         sw.Write('#');
                     else if (c == BoardContents.SAND)
                         sw.Write('o');
-                    else if (y == 0 && x == SOURCE_X - FirstX)
+                    else if (y == 0 && x == XOffset + SourceX - FirstX)
                         sw.Write('+');
                     else
                         sw.Write('.');
@@ -236,7 +247,7 @@ public class Day14
             var sw = new StringWriter();
 
             sw.Write($"#PATHS = {Lines.Length}, Height = {Height}, Width = {Width}  [{FirstX}-{FirstX + Width - 1} x 0-{Height - 1}]");
-            sw.WriteLine($", Source ({SOURCE_X}) is {(SourceValid ? "OK" : "INVALID!!!")}");
+            sw.WriteLine($", Source ({SourceX}) is {(SourceValid ? "OK" : "INVALID!!!")}");
 
             sw.Write(BoardToString());
 
@@ -246,12 +257,9 @@ public class Day14
 
     public Day14() { }
 
-    private Model GetModel(DataType which = DataType.INPUT, int control1 = 0, bool debug = false)
+    private Model GetModel(DataType which = DataType.INPUT, int part = PART_1)
     {
-        // control1 - optional control parameter (sometimes parts 1 and 2 have different behaviour)
-        // debug - optional debug parameter
-
-        return new Model(which == DataType.INPUT ? Day14Data.INPUT : Day14Data.SAMPLE);
+        return new Model(which == DataType.INPUT ? Day14Data.INPUT : Day14Data.SAMPLE, part);
     }
 
     public Result Answer()
@@ -262,14 +270,13 @@ public class Day14
 
         var day = Utils.NumSpace(this.GetType().Name);
         Console.WriteLine($"{day} - #LINES = {model.Lines.Length}");
-        Console.WriteLine(model);
+        // Console.WriteLine(model);
 
-        var result1 = new Result(model.Part1(), model.Lines.Length);
+        var result1 = new Result(model.Solve(), model.Lines.Length);
         Console.WriteLine($"Part 1 = {result1}");
 
-        // TODO: Possible altenative model - or keep using above version
-        model = GetModel(which, 123);
-        var result2 = new Result(model.Part2(), model.Lines.Length);
+        model = GetModel(which, PART_2);
+        var result2 = new Result(model.Solve(), model.Lines.Length);
         Console.WriteLine($"Part 2 = {result2}");
 
         return new Result(result1.P1, result2.P1);
