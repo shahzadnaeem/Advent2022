@@ -94,6 +94,7 @@ public class Day14
 
             if (part == 2)
             {
+                // No offset as we want a complete wall
                 AddWall(new Position(FirstX + 0, Height - 1), new Position(FirstX + Width - 1, Height - 1), 0);
             }
         }
