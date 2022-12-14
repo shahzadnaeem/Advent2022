@@ -165,8 +165,6 @@ public class Day14
                         if (!DoDrop(grain, p, -1, 1) && !DoDrop(grain, p, 1, 1))
                         {
                             Board[p.X, p.Y] = BoardContents.SAND;
-
-                            // Console.WriteLine($"  -> ({p.X},{p.Y}) down");
                         }
                     }
                 }
