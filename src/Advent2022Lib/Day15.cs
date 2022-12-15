@@ -15,8 +15,6 @@ public class Day15
 
     public record Pos(int X, int Y);
 
-    // TODO: Other enums/consts/classes ...
-
     public record Beacon(Pos Pos);
     public record Sensor(Pos Pos, Beacon NearestBeacon, int MinDist);
 
@@ -75,13 +73,6 @@ public class Day15
 
             Width = MaxX - MinX + 1;
             Height = MaxY - MinY + 1;
-
-            // Sensors.Select((s, i) => (s, i)).ToList()
-            //     .ForEach(p =>
-            //     {
-            //         var dist = ManhattanDist(p.s.Pos, p.s.NearestBeacon.Pos);
-            //         Console.WriteLine($" Sensor: {p.s.Pos} => Beacon: {p.s.NearestBeacon.Pos}. Dist = {dist}");
-            //     });
         }
 
         private Pos ReadPos(string s, string sep = ",")
@@ -107,28 +98,26 @@ public class Day15
             return Math.Abs(p2.X - p1.X) + Math.Abs(p2.Y - p1.Y);
         }
 
-        // TODO: Parts 1 and 2
         public long Part1(int y, bool debug = false)
         {
             var result = 0L;
 
             var beacon = Beacons.Where(b => b.Pos.Y == y).Single();
 
-            // Adjust for the 'diamond' need to search along the required range!
+            // Adjust for the 'diamond' otherwise answer is too small!
             var minX = Sensors.Min(s => s.Pos.X - s.MinDist);
             var maxX = Sensors.Max(s => s.Pos.X + s.MinDist);
 
-            Console.WriteLine($"Beacon = {beacon}, MinX = {MinX}, MaxX = {MinX + Width - 1} => {minX}, {maxX}");
+            // Console.WriteLine($"Beacon = {beacon}, MinX = {MinX}, MaxX = {MinX + Width - 1} => {minX}, {maxX}");
 
             for (int x = minX; x < maxX; x++)
             {
                 var pos = new Pos(MinX + x, y);
-                // Console.WriteLine($"# Trying: {pos}");
 
                 if (Sensors.Any(s =>
                 {
                     var distToPos = ManhattanDist(pos, s.Pos);
-                    var distToNearestBeacon = ManhattanDist(s.Pos, s.NearestBeacon.Pos);
+                    var distToNearestBeacon = s.MinDist;
                     return distToPos <= distToNearestBeacon;
                 }))
                 {
@@ -146,6 +135,11 @@ public class Day15
 
             for (int x = 0; x <= limit; x++)
             {
+                if (x % 1 == 0)
+                {
+                    Console.WriteLine($"{x}...");
+                }
+
                 for (int y = 0; y <= limit; y++)
                 {
                     var pos = new Pos(x, y);
@@ -153,12 +147,7 @@ public class Day15
                     var allSensorsHaveCloserBeacon = Sensors.All(s =>
                     {
                         var distToPos = ManhattanDist(s.Pos, pos);
-                        var distToNearestBeacon = ManhattanDist(s.Pos, s.NearestBeacon.Pos);
-
-                        // if (pos.X == 14 && pos.Y == 11)
-                        // {
-                        //     Console.WriteLine($"  Sensor:{s.Pos} -> {pos}: {distToPos}, -> Beacon: {distToNearestBeacon}  {(distToPos > distToNearestBeacon ? "HIDDEN" : "VISBLE")}");
-                        // }
+                        var distToNearestBeacon = s.MinDist;
 
                         return distToPos > distToNearestBeacon;
                     });
@@ -179,8 +168,6 @@ public class Day15
 
         public override string ToString()
         {
-            // TODO: Additional details?
-
             var sw = new StringWriter();
 
             sw.WriteLine($"#LINES = {Lines.Length}, #SENSORS = {Sensors.Length}, #BEACONS = {Beacons.Length}");
@@ -192,18 +179,14 @@ public class Day15
 
     public Day15() { }
 
-    private Model GetModel(DataType which = DataType.INPUT, int control1 = 0, bool debug = false)
+    private Model GetModel(DataType which = DataType.INPUT)
     {
-        // control1 - optional control parameter (sometimes parts 1 and 2 have different behaviour)
-        // debug - optional debug parameter
-
         return new Model(which == DataType.INPUT ? Day15Data.INPUT : Day15Data.SAMPLE);
     }
 
     public Result Answer()
     {
-        // TODO: Start with SAMPLE data
-        DataType which = DataType.SAMPLE;
+        DataType which = DataType.INPUT;
 
         var part1Row = which == DataType.SAMPLE ? 10 : 2000000;
         var part2Limit = which == DataType.SAMPLE ? 20 : 4000000;
@@ -217,8 +200,6 @@ public class Day15
         var result1 = new Result(model.Part1(part1Row), model.Lines.Length);
         Console.WriteLine($"Part 1 = {result1}");
 
-        // TODO: Possible altenative model - or keep using above version
-        // model = GetModel(which, 123);
         var result2 = new Result(model.Part2(part2Limit), model.Lines.Length);
         Console.WriteLine($"Part 2 = {result2}");
 
