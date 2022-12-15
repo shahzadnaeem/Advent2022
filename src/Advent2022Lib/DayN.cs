@@ -8,6 +8,9 @@ public class DayN
         SAMPLE
     }
 
+    const int PART_1 = 1;
+    const int PART_2 = 2;
+
     // TODO: Other enums/consts/classes ...
 
     public class Model
@@ -63,7 +66,7 @@ public class DayN
 
         var model = GetModel(which);
 
-        var day = Utils.NumSpace(this.GetType().Name);
+        var day = RunUtils.NumSpace(this.GetType().Name);
         Console.WriteLine($"{day} - #LINES = {model.Lines.Length}");
 
         var result1 = new Result(model.Part1(), model.Lines.Length);

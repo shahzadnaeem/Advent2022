@@ -238,8 +238,6 @@ public class Day14
 
         public override string ToString()
         {
-            // TODO: Additional details?
-
             var sw = new StringWriter();
 
             sw.Write($"#PATHS = {Lines.Length}, Height = {Height}, Width = {Width}  [{FirstX}-{FirstX + Width - 1} x 0-{Height - 1}]");
@@ -264,7 +262,7 @@ public class Day14
 
         var model = GetModel(which);
 
-        var day = Utils.NumSpace(this.GetType().Name);
+        var day = RunUtils.NumSpace(this.GetType().Name);
         Console.WriteLine($"{day} - #LINES = {model.Lines.Length}");
         // Console.WriteLine(model);
 

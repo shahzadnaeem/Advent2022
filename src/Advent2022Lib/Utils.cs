@@ -4,7 +4,7 @@ namespace Advent2022;
 
 public record Result(long P1, long P2);
 
-public class Utils
+public class RunUtils
 {
     public const int YEAR = 2022;
     public const int ADVENT = 12;
@@ -34,6 +34,7 @@ public class Utils
         return wr.ToString();
     }
 
+    // For "Day14" to "Day 14"
     public static string NumSpace(string s)
     {
         var r = new Regex(@"(\D+)(\d+)");
@@ -44,10 +45,10 @@ public class Utils
     public static void Title(string title)
     {
         Console.WriteLine("\n");
-        Utils.Red();
+        RunUtils.Red();
         Console.WriteLine(title);
         Console.WriteLine(new string('=', title.Length));
-        Utils.White();
+        RunUtils.White();
     }
 
 
@@ -61,14 +62,14 @@ public class Utils
             Title($"👍 Today is Day {day} 👍");
         }
 
-        Utils.Green();
+        RunUtils.Green();
         Console.WriteLine($"\nDay {day}");
-        Utils.Yellow();
+        RunUtils.Yellow();
     }
 
     public static void Result(string result)
     {
-        Utils.White();
+        RunUtils.White();
         Console.WriteLine(result);
     }
 

@@ -1,6 +1,6 @@
 namespace Advent2022;
 
-public class Day13
+public class Day15
 {
     enum DataType
     {
@@ -8,9 +8,7 @@ public class Day13
         SAMPLE
     }
 
-    // NOTE: Too gnarly for C#! and I'm lazy!
-    //       Used the following - https://github.com/hyper-neutrino/advent-of-code/blob/main/2022/day13p[12].py
-    //       All I did was add some comments - yep, cheating so nil points for me!
+    // TODO: Other enums/consts/classes ...
 
     public class Model
     {
@@ -19,40 +17,48 @@ public class Day13
         public Model(string input)
         {
             Lines = input.Split(Environment.NewLine);
+
+            // TODO: Define and initialise...
         }
 
+        // TODO: Parts 1 and 2
         public long Part1(bool debug = false)
         {
-            return 5330;
+            // TODO: Stuff...
+            return -1;
         }
 
         public long Part2(bool debug = false)
         {
-            return 27648;
+            // TODO: Stuff...
+            return -1;
         }
 
         public override string ToString()
         {
+            // TODO: Additional details?
+
             var sw = new StringWriter();
 
-            sw.Write($"See src/python/day13p[12].py");
+            sw.Write($"Model info - like sample");
 
             return sw.ToString();
         }
     }
 
-    public Day13() { }
+    public Day15() { }
 
     private Model GetModel(DataType which = DataType.INPUT, int control1 = 0, bool debug = false)
     {
         // control1 - optional control parameter (sometimes parts 1 and 2 have different behaviour)
         // debug - optional debug parameter
 
-        return new Model(which == DataType.INPUT ? Day13Data.INPUT : Day13Data.SAMPLE);
+        return new Model(which == DataType.INPUT ? DayNData.INPUT : DayNData.SAMPLE);
     }
 
     public Result Answer()
     {
+        // TODO: Start with SAMPLE data
         DataType which = DataType.SAMPLE;
 
         var model = GetModel(which);
@@ -63,6 +69,8 @@ public class Day13
         var result1 = new Result(model.Part1(), model.Lines.Length);
         Console.WriteLine($"Part 1 = {result1}");
 
+        // TODO: Possible altenative model - or keep using above version
+        model = GetModel(which, 123);
         var result2 = new Result(model.Part2(), model.Lines.Length);
         Console.WriteLine($"Part 2 = {result2}");
 

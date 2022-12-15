@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Advent2022;
 
 public class Day12
@@ -343,7 +341,7 @@ public class Day12
 
         var model = GetModel(which);
 
-        var day = Utils.NumSpace(this.GetType().Name);
+        var day = RunUtils.NumSpace(this.GetType().Name);
         Console.WriteLine($"{day} - #LINES = {model.Lines.Length}");
         // Console.WriteLine($"{model}");
 

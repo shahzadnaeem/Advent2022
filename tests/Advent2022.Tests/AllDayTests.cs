@@ -1,4 +1,5 @@
 using Advent2022;
+
 using Xunit;
 
 namespace Advent2022Lib.Tests.Days;
@@ -143,7 +144,7 @@ public class AllDayTests
         var day = new Day12();
 
         // shortest from Start, shortest overall
-        var expected = new Advent2022.Result(408, 399);
+        var expected = new Result(408, 399);
         var result = day.Answer();
 
         Assert.Equal(expected, result);
@@ -155,7 +156,7 @@ public class AllDayTests
         var day = new Day13();
 
         // correct order sum, decoder key
-        var expected = new Advent2022.Result(5330, 27648);
+        var expected = new Result(5330, 27648);
         var result = day.Answer();
 
         Assert.Equal(expected, result);
@@ -167,7 +168,7 @@ public class AllDayTests
         var day = new Day14();
 
         // grains, grains with floor
-        var expected = new Advent2022.Result(897, 26683);
+        var expected = new Result(897, 26683);
         var result = day.Answer();
 
         Assert.Equal(expected, result);
