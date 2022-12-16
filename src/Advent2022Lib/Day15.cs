@@ -163,7 +163,7 @@ public class Day15
 
         private List<List<Range>> MakeBoard(int size)
         {
-            var board = Enumerable.Range(0, size + 1).Select(y =>
+            var board = Enumerable.Range(0, size).Select(y =>
             {
                 var row = new List<Range>();
                 row.Add(new Range(new Pos(0, y), new Pos(size, y)));
@@ -320,19 +320,21 @@ public class Day15
             if (newBoard.Count != 1)
             {
                 // What happened???
-                newBoard.Take(10).Select((r, i) => (r, i)).ToList().ForEach(r =>
-                {
-                    Console.Write($"Row: {r.i}: ");
+                // newBoard.Take(10).Select((r, i) => (r, i)).ToList().ForEach(r =>
+                // {
+                //     Console.Write($"Row: {r.i}: ");
 
-                    if (r.r.Count != 0)
-                    {
-                        Console.WriteLine($"{r.r[0]}");
-                    }
-                    else
-                    {
-                        Console.WriteLine("EMPTY!");
-                    }
-                });
+                //     if (r.r.Count != 0)
+                //     {
+                //         Console.WriteLine($"{r.r[0]}");
+                //     }
+                //     else
+                //     {
+                //         Console.WriteLine("EMPTY!");
+                //     }
+                // });
+
+                result = -newBoard.Count;
             }
 
             return result;
