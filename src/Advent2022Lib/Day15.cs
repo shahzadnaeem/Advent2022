@@ -160,12 +160,16 @@ public class Day15
 
         private List<Range> MakeBoard(int size)
         {
-            var board = Enumerable.Range(0, size).Select(y =>
+            var board = Enumerable.Range(0, size + 1).Select(y =>
             {
                 return new Range(new Pos(0, y), new Pos(size, y));
-            });
+            }).ToList();
 
-            return board.ToList();
+            Console.WriteLine($"\nBoard");
+            Console.WriteLine($"  {{{board[0].start}, {board[0].end}}}");
+            Console.WriteLine($"  {{{board[board.Count - 1].start},{board[board.Count - 1].end}}}");
+
+            return board;
         }
 
         private List<Range> ProcessRange(Range range, Sensor s)
@@ -174,20 +178,16 @@ public class Day15
 
             var (from, to) = range;
 
-            if (s.Pos.X < from.X)
+            if (s.Pos.X < from.X)  // Sensor on left
             {
                 var dist = s.BeaconDist - ManhattanDist(s.Pos, from);
                 if (dist >= 0)
                 {
-                    // Sensor on left with overlap
                     var newX = from.X + dist + 1;
-                    if (newX >= to.X)
+                    if (newX < to.X)
                     {
-                        // return new List<Range>();
-                    }
-                    else
-                    {
-                        result.Add(new Range(from, new Pos(newX, to.Y)));
+                        // Grow from
+                        result.Add(new Range(new Pos(newX, from.Y), to));
                     }
                 }
                 else
@@ -195,19 +195,15 @@ public class Day15
                     result.Add(range);
                 }
             }
-            else if (s.Pos.X > to.X)
+            else if (s.Pos.X > to.X)  // Sensor on right
             {
                 var dist = s.BeaconDist - ManhattanDist(s.Pos, to);
                 if (dist >= 0)
                 {
-                    // Sensor on right with overlap
                     var newX = to.X - dist - 1;
-                    if (newX <= from.X)
+                    if (newX > from.X)
                     {
-                        // return new List<Range>();
-                    }
-                    else
-                    {
+                        // Shrink to
                         result.Add(new Range(from, new Pos(newX, to.Y)));
                     }
                 }
@@ -216,9 +212,9 @@ public class Day15
                     result.Add(range);
                 }
             }
-            else
+            else  // Sensor in range
             {
-                // Sensor in range
+                // Get any X overlap width - using Y difference between Sensor and Row
                 var dist = s.BeaconDist - ManhattanDist(new Pos(0, s.Pos.Y), new Pos(0, from.Y)) + 1;
                 if (dist > 0)
                 {
@@ -227,12 +223,14 @@ public class Day15
                     var newX = s.Pos.X - dist;
                     if (from.X <= newX)
                     {
+                        // New left range
                         result.Add(new Range(from, new Pos(newX, to.Y)));
                     }
 
                     newX = s.Pos.X + dist;
                     if (newX <= to.X)
                     {
+                        // New right range
                         result.Add(new Range(new Pos(newX, from.Y), to));
                     }
                 }
@@ -269,11 +267,9 @@ public class Day15
         {
             var result = 0L;
 
-            var board = MakeBoard(limit + 1);
+            var board = MakeBoard(limit);
 
             var newBoard = RemoveSensedAreas(board);
-
-            Console.WriteLine($"Part2 done: resulting board rowCount = {newBoard.Count}!");
 
             if (newBoard.Count == 1)
             {
@@ -284,7 +280,7 @@ public class Day15
             }
             else
             {
-                Console.WriteLine($"ERROR: Did not converge!");
+                Console.WriteLine($"ERROR: #Results = {newBoard.Count} != 1!");
 
                 newBoard.Take(10).Select((r, i) => (r, i)).ToList().ForEach(r =>
                 {
