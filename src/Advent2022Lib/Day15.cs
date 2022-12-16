@@ -20,7 +20,7 @@ public class Day15
     public record Range(Pos start, Pos end);
 
     public record Beacon(Pos Pos);
-    public record Sensor(Pos Pos, Beacon NearestBeacon, int MinDist);
+    public record Sensor(Pos Pos, Beacon NearestBeacon, int BeaconDist);
 
     public class Model
     {
@@ -108,19 +108,19 @@ public class Day15
             var beacon = Beacons.Where(b => b.Pos.Y == y).Single();
 
             // Adjust for the 'diamond' otherwise answer is too small!
-            var minX = Sensors.Min(s => s.Pos.X - s.MinDist);
-            var maxX = Sensors.Max(s => s.Pos.X + s.MinDist);
+            var minX = Sensors.Min(s => s.Pos.X - s.BeaconDist);
+            var maxX = Sensors.Max(s => s.Pos.X + s.BeaconDist);
 
             for (int x = minX; x < maxX; x++)
             {
                 var pos = new Pos(MinX + x, y);
 
-                if (Sensors.Any(s =>
+                if (Sensors.Any((Func<Sensor, bool>)(s =>
                 {
                     var distToPos = ManhattanDist(pos, s.Pos);
-                    var distToNearestBeacon = s.MinDist;
+                    var distToNearestBeacon = s.BeaconDist;
                     return distToPos <= distToNearestBeacon;
-                }))
+                })))
                 {
                     if (pos != beacon.Pos)
                         result++;
@@ -143,9 +143,8 @@ public class Day15
                     var allSensorsHaveCloserBeacon = Sensors.All(s =>
                     {
                         var distToPos = ManhattanDist(s.Pos, pos);
-                        var distToNearestBeacon = s.MinDist;
 
-                        return distToPos > distToNearestBeacon;
+                        return distToPos > s.BeaconDist;
                     });
 
                     if (allSensorsHaveCloserBeacon)
@@ -174,11 +173,13 @@ public class Day15
             var result = new List<Range>();
 
             var (from, to) = range;
+
             if (s.Pos.X < from.X)
             {
-                var dist = s.MinDist - ManhattanDist(s.Pos, from);
+                var dist = s.BeaconDist - ManhattanDist(s.Pos, from);
                 if (dist >= 0)
                 {
+                    // Sensor on left with overlap
                     var newX = from.X + dist + 1;
                     if (newX >= to.X)
                     {
@@ -196,9 +197,10 @@ public class Day15
             }
             else if (s.Pos.X > to.X)
             {
-                var dist = s.MinDist - ManhattanDist(s.Pos, to);
+                var dist = s.BeaconDist - ManhattanDist(s.Pos, to);
                 if (dist >= 0)
                 {
+                    // Sensor on right with overlap
                     var newX = to.X - dist - 1;
                     if (newX <= from.X)
                     {
@@ -216,9 +218,12 @@ public class Day15
             }
             else
             {
-                var dist = s.MinDist - ManhattanDist(new Pos(0, s.Pos.Y), new Pos(0, from.Y)) + 1;
+                // Sensor in range
+                var dist = s.BeaconDist - ManhattanDist(new Pos(0, s.Pos.Y), new Pos(0, from.Y)) + 1;
                 if (dist > 0)
                 {
+                    // Potential split (not both or any if boundary hit)
+
                     var newX = s.Pos.X - dist;
                     if (from.X <= newX)
                     {
