@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Advent2022;
 
-public record Result(long P1, long P2);
+public record Result(long P1, long P2 = 0);
 
 public class RunUtils
 {
