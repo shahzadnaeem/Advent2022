@@ -48,8 +48,6 @@ public class Day15
             {
                 var regexed = r.Replace(line.l, @"$1,$2 $3,$4");
 
-                // Console.WriteLine($"#  {line}\n#  {regexed}");
-
                 if (!regexed.Contains("Sensor"))
                 {
                     var posPair = Read2Pos(regexed);
@@ -68,6 +66,8 @@ public class Day15
 
             Beacons = beacons.ToArray();
             Sensors = sensors.ToArray();
+
+            // Post process
 
             MaxX = Beacons.Select((b) => (b.Pos.X)).Concat(Sensors.Select(s => s.Pos.X)).Max();
             MinX = Beacons.Select((b) => (b.Pos.X)).Concat(Sensors.Select(s => s.Pos.X)).Min();
@@ -110,8 +110,6 @@ public class Day15
             // Adjust for the 'diamond' otherwise answer is too small!
             var minX = Sensors.Min(s => s.Pos.X - s.MinDist);
             var maxX = Sensors.Max(s => s.Pos.X + s.MinDist);
-
-            // Console.WriteLine($"Beacon = {beacon}, MinX = {MinX}, MaxX = {MinX + Width - 1} => {minX}, {maxX}");
 
             for (int x = minX; x < maxX; x++)
             {
@@ -161,138 +159,100 @@ public class Day15
             return result;
         }
 
-        private List<List<Range>> MakeBoard(int size)
+        private List<Range> MakeBoard(int size)
         {
             var board = Enumerable.Range(0, size).Select(y =>
             {
-                var row = new List<Range>();
-                row.Add(new Range(new Pos(0, y), new Pos(size, y)));
-                return row;
+                return new Range(new Pos(0, y), new Pos(size, y));
             });
 
             return board.ToList();
         }
 
-        private List<Range> ProcessSensedRow(List<Range> row, Sensor s)
+        private List<Range> ProcessRange(Range range, Sensor s)
         {
-            // if (row[0].start.Y == 11 && row.Count == 2)
-            // {
-            //     var p = 1;
-            //     p++;
-            // }
+            var result = new List<Range>();
 
-            var newRow = row.SelectMany(range =>
+            var (from, to) = range;
+            if (s.Pos.X < from.X)
             {
-                var (from, to) = range;
-                if (s.Pos.X < from.X)
+                var dist = s.MinDist - ManhattanDist(s.Pos, from);
+                if (dist >= 0)
                 {
-                    var dist = s.MinDist - ManhattanDist(s.Pos, from);
-                    if (dist >= 0)
+                    var newX = from.X + dist + 1;
+                    if (newX >= to.X)
                     {
-                        var newX = from.X + dist + 1;
-                        if (newX >= to.X)
-                        {
-                            return new List<Range>();
-                        }
-                        else
-                        {
-                            return new List<Range> { new Range(from, new Pos(newX, to.Y)) };
-                        }
+                        // return new List<Range>();
                     }
                     else
                     {
-                        return new List<Range>() { range };
-                    }
-                }
-                else if (s.Pos.X > to.X)
-                {
-                    var dist = s.MinDist - ManhattanDist(s.Pos, to);
-                    if (dist >= 0)
-                    {
-                        var newX = to.X - dist - 1;
-                        if (newX <= from.X)
-                        {
-                            return new List<Range>();
-                        }
-                        else
-                        {
-                            return new List<Range> { new Range(from, new Pos(newX, to.Y)) };
-                        }
-                    }
-                    else
-                    {
-                        return new List<Range>() { range };
+                        result.Add(new Range(from, new Pos(newX, to.Y)));
                     }
                 }
                 else
                 {
-                    var dist = s.MinDist - ManhattanDist(new Pos(0, s.Pos.Y), new Pos(0, from.Y)) + 1;
-                    if (dist > 0)
+                    result.Add(range);
+                }
+            }
+            else if (s.Pos.X > to.X)
+            {
+                var dist = s.MinDist - ManhattanDist(s.Pos, to);
+                if (dist >= 0)
+                {
+                    var newX = to.X - dist - 1;
+                    if (newX <= from.X)
                     {
-                        var newRow = new List<Range>();
-
-                        var newX = s.Pos.X - dist;
-                        if (from.X <= newX)
-                        {
-                            newRow.Add(new Range(from, new Pos(newX, to.Y)));
-                        }
-
-                        newX = s.Pos.X + dist;
-                        if (newX <= to.X)
-                        {
-                            newRow.Add(new Range(new Pos(newX, from.Y), to));
-                        }
-
-                        return newRow;
+                        // return new List<Range>();
                     }
                     else
                     {
-                        return new List<Range>() { range };
+                        result.Add(new Range(from, new Pos(newX, to.Y)));
                     }
                 }
-            });
+                else
+                {
+                    result.Add(range);
+                }
+            }
+            else
+            {
+                var dist = s.MinDist - ManhattanDist(new Pos(0, s.Pos.Y), new Pos(0, from.Y)) + 1;
+                if (dist > 0)
+                {
+                    var newX = s.Pos.X - dist;
+                    if (from.X <= newX)
+                    {
+                        result.Add(new Range(from, new Pos(newX, to.Y)));
+                    }
 
-            var result = newRow.ToList();
-
-            // var rowEntries = row.Count;
-            // var newRowEntries = result.Count;
-            // var rowNum = row[0].start.Y;
-
-            // Console.WriteLine($"row #{rowNum}: {rowEntries} -> {newRowEntries}");
-
-            // if (newRowEntries > rowEntries || newRowEntries == 1)
-            // {
-            //     Console.WriteLine($"\n\nrow #{result[0].start.Y} changed from {rowEntries} to {newRowEntries}");
-            //     row.ForEach(range =>
-            //     {
-            //         Console.WriteLine($"{range.start} -> {range.end}");
-            //     });
-
-            //     Console.WriteLine("\n");
-
-            //     result.ForEach(range =>
-            //     {
-            //         Console.WriteLine($"{range.start} -> {range.end}");
-            //     });
-            // }
+                    newX = s.Pos.X + dist;
+                    if (newX <= to.X)
+                    {
+                        result.Add(new Range(new Pos(newX, from.Y), to));
+                    }
+                }
+                else
+                {
+                    result.Add(range);
+                }
+            }
 
             return result;
         }
 
-        private List<List<Range>> RemoveSensedArea(List<List<Range>> board, Sensor s)
+        private List<Range> RemoveSensedArea(List<Range> board, Sensor s)
         {
             var newBoard = board
-                .Select(row => ProcessSensedRow(row, s))
-                .Where(row => row.Count != 0)
+                .SelectMany(range => ProcessRange(range, s))
                 .ToList();
 
             return newBoard;
         }
 
-        private List<List<Range>> RemoveSensedAreas(List<List<Range>> board)
+        private List<Range> RemoveSensedAreas(List<Range> board)
         {
             var newBoard = Sensors
-                .Aggregate<Sensor, List<List<Range>>>(board, (board, sensor) =>
+                .Aggregate<Sensor, List<Range>>(board, (board, sensor) =>
                 {
                     return RemoveSensedArea(board, sensor);
                 });
@@ -304,35 +264,29 @@ public class Day15
         {
             var result = 0L;
 
-            var board = MakeBoard(limit);
+            var board = MakeBoard(limit + 1);
 
             var newBoard = RemoveSensedAreas(board);
 
             Console.WriteLine($"Part2 done: resulting board rowCount = {newBoard.Count}!");
 
-            if (newBoard.Count == 1 && newBoard[0].Count == 1)
+            if (newBoard.Count == 1)
             {
                 var range = newBoard[0];
-                var row = range[0];
-                result = row.start.X * PART_2_RES_X_SCALE + row.start.Y;
+                result = ((long)range.start.X * (long)PART_2_RES_X_SCALE) + (long)range.start.Y;
+
+                // Console.WriteLine($"result: {result} = start=({range.start.X},{range.start.Y}), end=({range.end.X},{range.end.Y})");
             }
-
-            if (newBoard.Count != 1)
+            else
             {
-                // What happened???
-                // newBoard.Take(10).Select((r, i) => (r, i)).ToList().ForEach(r =>
-                // {
-                //     Console.Write($"Row: {r.i}: ");
+                Console.WriteLine($"ERROR: Did not converge!");
 
-                //     if (r.r.Count != 0)
-                //     {
-                //         Console.WriteLine($"{r.r[0]}");
-                //     }
-                //     else
-                //     {
-                //         Console.WriteLine("EMPTY!");
-                //     }
-                // });
+                newBoard.Take(10).Select((r, i) => (r, i)).ToList().ForEach(r =>
+                {
+                    Console.Write($"Range: {r.i}: ");
+
+                    Console.WriteLine($"{r.r}");
+                });
 
                 result = -newBoard.Count;
             }
