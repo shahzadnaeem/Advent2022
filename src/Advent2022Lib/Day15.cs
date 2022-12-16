@@ -165,12 +165,17 @@ public class Day15
                 return new Range(new Pos(0, y), new Pos(size, y));
             }).ToList();
 
-            Console.WriteLine($"\nBoard");
-            Console.WriteLine($"  {{{board[0].start}, {board[0].end}}}");
-            Console.WriteLine($"  {{{board[board.Count - 1].start},{board[board.Count - 1].end}}}");
+            // Console.WriteLine($"\nBoard");
+            // Console.WriteLine($"  {{{board[0].start}, {board[0].end}}}");
+            // Console.WriteLine($"  {{{board[board.Count - 1].start}, {board[board.Count - 1].end}}}");
 
             return board;
         }
+
+        // NOTE:
+        // Got the following algorithm from - https://www.erlang-solutions.com/blog/advent-of-code-2022/
+        // Had to fix an off by one error which took a while. Worked for author's input data but
+        // gave no result with my data! Took too long :) :(
 
         private List<Range> ProcessRange(Range range, Sensor s)
         {
@@ -184,7 +189,7 @@ public class Day15
                 if (dist >= 0)
                 {
                     var newX = from.X + dist + 1;
-                    if (newX < to.X)
+                    if (newX <= to.X)   // NOTE: Off by one error
                     {
                         // Grow from
                         result.Add(new Range(new Pos(newX, from.Y), to));
@@ -201,7 +206,7 @@ public class Day15
                 if (dist >= 0)
                 {
                     var newX = to.X - dist - 1;
-                    if (newX > from.X)
+                    if (newX >= from.X)   // NOTE: Off by one error
                     {
                         // Shrink to
                         result.Add(new Range(from, new Pos(newX, to.Y)));
@@ -316,7 +321,7 @@ public class Day15
 
     public Result Answer()
     {
-        DataType which = DataType.INPUT;
+        DataType which = DataType.SAMPLE;
 
         var part1Row = which == DataType.SAMPLE ? 10 : 2000000;
         var part2Limit = which == DataType.SAMPLE ? 20 : PART_2_RES_X_SCALE;
@@ -325,7 +330,7 @@ public class Day15
         // Console.WriteLine(model);
 
         var day = RunUtils.NumSpace(this.GetType().Name);
-        Console.WriteLine($"{day} - #SENSORS = {model.Sensors.Length}, #BEACONS = {model.Beacons.Length}");
+        Console.WriteLine($"{day} - [SLOW, so using SAMPLE data] #SENSORS = {model.Sensors.Length}, #BEACONS = {model.Beacons.Length}");
 
         var result1 = new Result(model.Part1(part1Row));
         Console.WriteLine($"Part 1 = {result1}");

@@ -12,6 +12,12 @@ $ make test  # to run tests for all days
 # See Makefile for dotnet commands to run
 ```
 
+## Day 16+ 🗿 who knows 🤔 ...
+
+## Day 15 - Eventually and late!
+
+I think that will do for now ...
+
 ## Day 14 - Bah Humbug 😬
 
 ```text

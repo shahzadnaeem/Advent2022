@@ -173,4 +173,19 @@ public class AllDayTests
 
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void Day15Test()
+    {
+        var day = new Day15();
+
+        // NOTE: Real INPUT data values - long run time, so using SAMPLE instead
+        // var expected = new Result(5367037, 11914583249288);
+
+        // no beacon locations, tuning freq
+        var expected = new Result(26, 56000011);
+        var result = day.Answer();
+
+        Assert.Equal(expected, result);
+    }
 }

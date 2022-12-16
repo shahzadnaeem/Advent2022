@@ -52,7 +52,7 @@ Sensor at x=2650714, y=3674470: closest beacon is at x=2505629, y=4282497
 Sensor at x=1696740, y=586715: closest beacon is at x=1929144, y=529341
 Sensor at x=3818789, y=2961752: closest beacon is at x=3629407, y=2984857";
 
-    // NOTE: Erlang solution data - this code works with it, but fails with the above :(
+    // NOTE: Erlang solution data - BOTH now work as an off by one error was fixed
     public const string INPUT1 = @"Sensor at x=3999724, y=2000469: closest beacon is at x=4281123, y=2282046
 Sensor at x=3995530, y=8733: closest beacon is at x=3321979, y=-692911
 Sensor at x=3016889, y=2550239: closest beacon is at x=2408038, y=2645605
